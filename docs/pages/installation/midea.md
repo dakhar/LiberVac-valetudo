@@ -101,7 +101,7 @@ If you saw `OTP Password:`, the next step is to run `dmesg` and look for output 
 [ 4479.875489] usb 1-4: new high-speed USB device number 11 using xhci_hcd
 [ 4480.016640] usb 1-4: New USB device found, idVendor=2207, idProduct=0019, bcdDevice= 3.10
 [ 4480.016658] usb 1-4: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-[ 4480.016665] usb 1-4: Product: robot
+[ 4480.016665] usb 1-4: Pzroduct: robot
 [ 4480.016670] usb 1-4: Manufacturer: world
 [ 4480.016674] usb 1-4: SerialNumber: 243f6a8885a308d3
 [ 4480.020308] cdc_acm 1-4:1.1: ttyACM0: USB ACM device

@@ -53,7 +53,7 @@ class MideaWifiConfigurationCapability extends LinuxWifiConfigurationCapability 
      */
     performFullProvisioningSequence(wifiConfig) {
         const host = "127.0.0.1";
-        const port = 9999;
+        const port = this.robot.getWifiProvisioningPort();
 
         return new Promise((resolve, reject) => {
             const client = new net.Socket();

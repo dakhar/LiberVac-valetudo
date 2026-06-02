@@ -5,4 +5,5 @@ module.exports = {
     "MideaJ15MaxUltraValetudoRobot": require("./MideaJ15MaxUltraValetudoRobot"),
     "MideaJ15ProUltraValetudoRobot": require("./MideaJ15ProUltraValetudoRobot"),
     "MideaJ15UltraValetudoRobot": require("./MideaJ15UltraValetudoRobot"),
+    "MideaV16ValetudoRobot": require("./MideaV16ValetudoRobot"),
 };

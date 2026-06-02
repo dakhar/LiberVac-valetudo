@@ -1114,6 +1114,16 @@ class MideaValetudoRobot extends ValetudoRobot {
     }
 
     /**
+     * Local TCP port of the on-device MSmart provisioning daemon (softAP/pairing mode).
+     * Most robots use 9999; some (e.g. the V16) use the standard Midea LAN port 6444.
+     *
+     * @returns {number}
+     */
+    getWifiProvisioningPort() {
+        return 9999;
+    }
+
+    /**
      * @private
      * @returns {string|undefined}
      */
