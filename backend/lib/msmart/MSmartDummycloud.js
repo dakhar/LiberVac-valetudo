@@ -465,9 +465,18 @@ class MSmartDummycloud {
             res.status(200).send();
         });
 
-        // Clean record (possibly after a successful one?) as a protobuf. FW just expects 200. Observed on J15 Max Ultra FW 529
+        // Clean record (uploaded after a finished cleanup) as a protobuf.
+        // J15 Max Ultra FW 529 just expected a 200 with any body, but the V16
+        // (RK3566 SHIHU, release_mp_65) firmware's MapService::_cleanRecordUpload
+        // unconditionally does `std::string(responseBody)` on the raw response
+        // pointer. An empty body leaves that pointer NULL, so the std::string ctor
+        // throws std::logic_error ("basic_string::_M_construct null not valid"),
+        // which is uncaught and SIGABRTs iot_node right after every cleanup.
+        // It then parses the body as JSON and reads "code" as an *integer*
+        // (compared against 2003 = token-expired), so the body must be valid JSON
+        // with a numeric (not string) "code" != 2003.
         app.post("/v3/dev2pro/m7/work/status/upload/proto", (req, res) => {
-            res.status(200).send();
+            res.status(200).json({ code: 0, msg: "OK" });
         });
 
         app.post("/v1/biz/file/device/uploadFileUrl", (req, res) => {

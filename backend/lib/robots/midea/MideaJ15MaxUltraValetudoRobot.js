@@ -148,7 +148,7 @@ class MideaJ15MaxUltraValetudoRobot extends MideaModernValetudoRobot {
             Logger.trace("cannot read", "/oem/midea/device.sn8", e);
         }
 
-        return ["750Y0014", "750Y0013"].includes(sn8);
+        return ["750Y0014", "750Y0013", "750000GH"].includes(sn8);
     }
 }
 
