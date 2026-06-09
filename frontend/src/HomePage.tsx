@@ -4,7 +4,15 @@ import {useIsMobileView} from "./hooks";
 import {FullHeightGrid} from "./components/FullHeightGrid";
 import LiveMapPage from "./map/LiveMapPage";
 import MobileControls from "./controls/MobileControls";
+import CameraOverlay from "./components/CameraOverlay";
 import React from "react";
+
+const MapWithCamera = (): React.ReactElement => (
+    <Box sx={{position: "relative", height: "100%", width: "100%"}}>
+        <LiveMapPage/>
+        <CameraOverlay/>
+    </Box>
+);
 
 const ScrollableGrid = styled(Grid2)({
     overflow: "auto",
@@ -25,7 +33,7 @@ const HomePage = (): React.ReactElement => {
                     height: "calc(100% - 68px)",
                     display: mobileControlsOpen ? "none" : "inherit"
                 }}>
-                    <LiveMapPage/>
+                    <MapWithCamera/>
                 </Box>
                 <Box sx={{
                     height: "5%",
@@ -45,7 +53,7 @@ const HomePage = (): React.ReactElement => {
     return (
         <FullHeightGrid container direction="row" justifyContent="space-evenly">
             <Grid2 size="grow">
-                <LiveMapPage/>
+                <MapWithCamera/>
             </Grid2>
             <Divider orientation="vertical"/>
             <ScrollableGrid size={{sm:4, md: 4, lg: 4, xl: 3}}>
