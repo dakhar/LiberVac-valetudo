@@ -174,7 +174,10 @@ class Tools {
     }
 
     static GET_ZEROCONF_HOSTNAME() {
-        return "valetudo-" + Tools.GET_HUMAN_READABLE_SYSTEM_ID().toLowerCase() + ".local";
+        // LiberVac: advertise a fixed, memorable mDNS name (vacuum.local) instead of the
+        // per-device valetudo-<id>.local. NOTE: hardcoded — if you run more than one robot
+        // on the same LAN, give them distinct names to avoid an mDNS name collision.
+        return "vacuum.local";
     }
 
     static IS_UPX_COMPRESSED(pathOnDisk) {
