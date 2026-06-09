@@ -266,6 +266,12 @@ const ru: Translations = {
         systemOptions: "Системные настройки",
         quirks: "Особенности",
         quirksDescription: "Настройка особенностей конкретной прошивки",
+        camera: "Камера",
+        cameraEnabled: "Включить камеру",
+        cameraEnabledDescription: "Показывать камеру на главном экране",
+        cameraUrl: "URL камеры",
+        cameraUrlDescription: "URL WebRTC-потока, встраиваемый в оверлей",
+        cameraUrlDialogDescription: "Введите URL потока камеры (плеер go2rtc WebRTC/MSE). Оставьте пустым для значения по умолчанию.",
     },
     valetudoOptions: {
         title: "Параметры Valetudo",

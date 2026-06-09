@@ -7,6 +7,7 @@ import {
     CloseFullscreen as ShrinkIcon,
 } from "@mui/icons-material";
 import {useTranslation} from "react-i18next";
+import {useCameraSettings} from "./cameraSettings";
 
 const STORAGE_KEY = "valetudo_camera_overlay";
 
@@ -19,15 +20,6 @@ const STORAGE_KEY = "valetudo_camera_overlay";
  * To proxy go2rtc through Valetudo's own webserver instead of hitting :1984 directly,
  * change CAMERA_SRC to a same-origin path (e.g. "/_camera/stream.html?...").
  */
-const GO2RTC_PORT = 1984;
-const CAMERA_STREAM = "cam";
-
-const cameraSrc = (): string => {
-    const host = window.location.hostname;
-
-    return `http://${host}:${GO2RTC_PORT}/stream.html?src=${CAMERA_STREAM}&mode=webrtc,mse`;
-};
-
 interface OverlayState {
     open: boolean;
     large: boolean;
@@ -48,6 +40,7 @@ const loadState = (): OverlayState => {
 
 const CameraOverlay = (): React.ReactElement => {
     const {t} = useTranslation();
+    const camera = useCameraSettings();
     const [state, setState] = React.useState<OverlayState>(loadState);
 
     const update = React.useCallback((patch: Partial<OverlayState>) => {
@@ -62,6 +55,10 @@ const CameraOverlay = (): React.ReactElement => {
             return next;
         });
     }, []);
+
+    if (!camera.enabled) {
+        return <></>;
+    }
 
     if (!state.open) {
         return (
@@ -125,7 +122,7 @@ const CameraOverlay = (): React.ReactElement => {
             <Box sx={{aspectRatio: "4 / 3", width: "100%", backgroundColor: "#000"}}>
                 <iframe
                     title={t("camera.title")}
-                    src={cameraSrc()}
+                    src={camera.url}
                     allow="autoplay; fullscreen"
                     style={{width: "100%", height: "100%", border: 0, display: "block"}}
                 />

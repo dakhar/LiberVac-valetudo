@@ -264,6 +264,12 @@ const en = {
         systemOptions: "System Options",
         quirks: "Quirks",
         quirksDescription: "Configure firmware-specific quirks",
+        camera: "Camera",
+        cameraEnabled: "Enable camera",
+        cameraEnabledDescription: "Show the live camera overlay on the home screen",
+        cameraUrl: "Camera URL",
+        cameraUrlDescription: "The WebRTC stream URL embedded by the overlay",
+        cameraUrlDialogDescription: "Enter the camera stream URL (go2rtc WebRTC/MSE player). Leave empty to use the default.",
     },
     valetudoOptions: {
         title: "Valetudo Options",

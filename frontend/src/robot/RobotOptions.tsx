@@ -81,6 +81,8 @@ import {
     TableBar as MopExtensionFurnitureLegHandlingControlIcon,
     Troubleshoot as CarpetSensorModeIcon,
     Tune as MiscIcon,
+    Videocam as CameraIcon,
+    Link as CameraUrlIcon,
     Villa as DockIcon
 } from "@mui/icons-material";
 import {SpacerListMenuItem} from "../components/list_menu/SpacerListMenuItem";
@@ -89,6 +91,8 @@ import PaperContainer from "../components/PaperContainer";
 import {ButtonListMenuItem} from "../components/list_menu/ButtonListMenuItem";
 import {SelectListMenuItem, SelectListMenuItemOption} from "../components/list_menu/SelectListMenuItem";
 import {SubHeaderListMenuItem} from "../components/list_menu/SubHeaderListMenuItem";
+import {TextEditModalListMenuItem} from "../components/list_menu/TextEditModalListMenuItem";
+import {defaultCameraUrl, setCameraSettings, useCameraSettings} from "../components/cameraSettings";
 import {
     MopExtensionControlCapability as MopExtensionControlCapabilityIcon,
     MopTwistControlCapability as MopTwistControlCapabilityIcon,
@@ -1014,6 +1018,51 @@ const AutoEmptyDockAutoEmptyDurationControlCapabilitySelectListMenuItem = () => 
     );
 };
 
+// Camera overlay settings (LiberVac, localStorage-backed — not a robot capability).
+const CameraEnabledSwitchListMenuItem = (): React.ReactElement => {
+    const {t} = useTranslation();
+    const camera = useCameraSettings();
+
+    return (
+        <ToggleSwitchListMenuItem
+            value={camera.enabled}
+            setValue={(value) => {
+                setCameraSettings({enabled: value});
+            }}
+            disabled={false}
+            loadError={false}
+            primaryLabel={t("robotOptions.cameraEnabled")}
+            secondaryLabel={t("robotOptions.cameraEnabledDescription")}
+            icon={<CameraIcon/>}
+        />
+    );
+};
+
+const CameraUrlEditListMenuItem = (): React.ReactElement => {
+    const {t} = useTranslation();
+    const camera = useCameraSettings();
+
+    return (
+        <TextEditModalListMenuItem
+            value={camera.url}
+            isLoading={false}
+            primaryLabel={t("robotOptions.cameraUrl")}
+            secondaryLabel={t("robotOptions.cameraUrlDescription")}
+            icon={<CameraUrlIcon/>}
+            dialog={{
+                title: t("robotOptions.cameraUrl"),
+                description: t("robotOptions.cameraUrlDialogDescription"),
+                onSave: (value) => {
+                    const trimmed = value.trim();
+                    // Store "" (= use the computed default) when it matches the default,
+                    // so the default keeps tracking the current host.
+                    setCameraSettings({url: trimmed === defaultCameraUrl() ? "" : trimmed});
+                }
+            }}
+        />
+    );
+};
+
 const RobotOptions = (): React.ReactElement => {
     const {t} = useTranslation();
     const [
@@ -1093,10 +1142,21 @@ const RobotOptions = (): React.ReactElement => {
             );
         }
 
+        // Camera overlay (LiberVac frontend feature — always available, localStorage-backed)
+        if (items.length > 0) {
+            items.push(<SpacerListMenuItem key={"spacer-camera"} halfHeight={true}/>);
+        }
+        items.push(
+            <SubHeaderListMenuItem key={"camera-header"} primaryLabel={t("robotOptions.camera")} icon={<CameraIcon/>}/>,
+            <CameraEnabledSwitchListMenuItem key={"cameraEnabled"}/>,
+            <CameraUrlEditListMenuItem key={"cameraUrl"}/>
+        );
+
         return items;
     }, [
         locateCapabilitySupported,
-        keyLockControlCapabilitySupported
+        keyLockControlCapabilitySupported,
+        t
     ]);
 
 
