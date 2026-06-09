@@ -43,6 +43,7 @@ import PaperContainer from "../../components/PaperContainer";
 import ConfirmationDialog from "../../components/ConfirmationDialog";
 import InfoBox from "../../components/InfoBox";
 import DetailPageHeaderRow from "../../components/DetailPageHeaderRow";
+import {useTranslation} from "react-i18next";
 
 const WifiStatusComponent: React.FunctionComponent<{
     status?: WifiStatus,
@@ -54,6 +55,7 @@ const WifiStatusComponent: React.FunctionComponent<{
     statusError
 }) => {
     const theme = useTheme();
+    const {t} = useTranslation();
 
     if (statusLoading || !status) {
         return (
@@ -62,7 +64,7 @@ const WifiStatusComponent: React.FunctionComponent<{
     }
 
     if (statusError) {
-        return <Typography color="error">Error loading Wi-Fi status</Typography>;
+        return <Typography color="error">{t("connectivity.wifi.statusLoadError")}</Typography>;
     }
 
     const getIconForState = (): React.ReactElement => {
@@ -92,17 +94,17 @@ const WifiStatusComponent: React.FunctionComponent<{
         switch (status.state) {
             case "not_connected":
                 return (
-                    <Typography variant="h5">Not connected</Typography>
+                    <Typography variant="h5">{t("connectivity.wifi.notConnected")}</Typography>
                 );
             case "unknown":
                 return (
-                    <Typography variant="h5">Unknown</Typography>
+                    <Typography variant="h5">{t("connectivity.wifi.unknown")}</Typography>
                 );
             case "connected":
                 return (
                     <>
                         <Typography variant="h5">
-                            {status.details.ssid ?? "Unknown SSID"}
+                            {status.details.ssid ?? t("connectivity.wifi.unknownSSID")}
                         </Typography>
 
                         {
@@ -164,6 +166,8 @@ const WifiStatusComponent: React.FunctionComponent<{
 };
 
 const WifiConnectivity = (): React.ReactElement => {
+    const {t} = useTranslation();
+
     const {
         data: wifiStatus,
         isPending: wifiStatusPending,
@@ -199,7 +203,7 @@ const WifiConnectivity = (): React.ReactElement => {
     }
 
     if (wifiStatusLoadError || !wifiStatus || propertiesLoadError || !properties) {
-        return <Typography color="error">Error loading Wi-Fi Status</Typography>;
+        return <Typography color="error">{t("connectivity.wifi.statusLoadError")}</Typography>;
     }
 
     return (
@@ -212,7 +216,7 @@ const WifiConnectivity = (): React.ReactElement => {
             <Divider sx={{mt: 1}} style={{marginBottom: "1rem"}}/>
 
             <Typography variant="h6" style={{marginBottom: "0.5rem"}}>
-                Change Wi-Fi configuration
+                {t("connectivity.wifi.changeConfiguration")}
             </Typography>
 
             {
@@ -221,7 +225,7 @@ const WifiConnectivity = (): React.ReactElement => {
                     <Grid2 style={{flexGrow: 1}}>
                         <TextField
                             style={{width: "100%"}}
-                            label="SSID/Wi-Fi name"
+                            label={t("connectivity.wifi.ssidLabel")}
                             value={newSSID}
                             variant="standard"
                             onChange={e => {
@@ -232,7 +236,7 @@ const WifiConnectivity = (): React.ReactElement => {
                     </Grid2>
                     <Grid2 style={{flexGrow: 1}}>
                         <FormControl style={{width: "100%"}} variant="standard">
-                            <InputLabel htmlFor="standard-adornment-password">PSK/Password</InputLabel>
+                            <InputLabel htmlFor="standard-adornment-password">{t("connectivity.wifi.pskLabel")}</InputLabel>
                             <Input
                                 type={showPasswordAsPlain ? "text" : "password"}
                                 fullWidth
@@ -273,20 +277,16 @@ const WifiConnectivity = (): React.ReactElement => {
                     }}
                 >
                     <Typography color="info">
-                        To connect your robot to a different Wi-Fi network, you need to do a Wi-Fi reset and then configure the new one using Valetudo.
-                        For most Xiaomi-ecosystem-style robots, this means pressing and holding the two outer buttons
-                        (usually &quot;Home&quot; and &quot;Spot Clean&quot; or &quot;Home&quot; and &quot;Power&quot; if there are just two) until the robot talks to you.
+                        {t("connectivity.wifi.resetInfoLine1")}
                         <br/><br/>
-                        Some supported robots may have dedicated connectivity buttons you need to press and hold.
-                        If it is anything more special than that, you will find guidance for your model of robot on the
-                        &quot;Supported Robots&quot; page in the docs on <a style={{color: "inherit"}} href="https://valetudo.cloud" target="_blank" rel="noreferrer">valetudo.cloud</a>.<br/>
-                        The robot may also have come with a manual by the vendor, which might contain guidance.
+                        {t("connectivity.wifi.resetInfoLine2Part1")}<a style={{color: "inherit"}} href="https://valetudo.cloud" target="_blank" rel="noreferrer">valetudo.cloud</a>{t("connectivity.wifi.resetInfoLine2Part2")}<br/>
+                        {t("connectivity.wifi.resetInfoLine3")}
 
                         <br/><br/>
 
-                        <strong>Note:</strong><br/>
-                        Don&apos;t be confused by buttons labelled &quot;Reset&quot; close to a Wi-Fi LED.<br/>
-                        Proximity does not mean that they&apos;re related. Instead, they usually factory-reset the machine, which is not what you want.
+                        <strong>{t("connectivity.wifi.noteLabel")}</strong><br/>
+                        {t("connectivity.wifi.resetNoteLine1")}<br/>
+                        {t("connectivity.wifi.resetNoteLine2")}
                     </Typography>
                 </InfoBox>
             }
@@ -306,13 +306,13 @@ const WifiConnectivity = (): React.ReactElement => {
                                 setConfirmationDialogOpen(true);
                             }}
                         >
-                            Save configuration
+                            {t("connectivity.common.saveConfiguration")}
                         </Button>
                     </Grid2>
                 </Grid2>
             }
             <ConfirmationDialog
-                title="Apply new Wi-Fi configuration?"
+                title={t("connectivity.wifi.applyDialogTitle")}
                 text=""
                 open={confirmationDialogOpen}
                 onClose={() => {
@@ -331,31 +331,29 @@ const WifiConnectivity = (): React.ReactElement => {
                 }}
             >
                 <DialogContentText>
-                    Are you sure you want to apply the new Wifi settings?
+                    {t("connectivity.wifi.applyDialogText")}
                     <br/>
                     <br/>
-                    <strong>Hint:</strong>
+                    <strong>{t("connectivity.wifi.hintLabel")}</strong>
                     <br/>
-                    You can always revert back to the integrated Wifi Hotspot.
-                    Check the documentation supplied with your robot for instructions on how to do so.
+                    {t("connectivity.wifi.applyDialogHint")}
                 </DialogContentText>
             </ConfirmationDialog>
 
             <Dialog open={finalDialogOpen}>
                 <DialogTitle>
-                    New Wifi configuration is applying
+                    {t("connectivity.wifi.applyingDialogTitle")}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        After pressing OK the page will refresh. However, you will most likely need to change the
-                        URL since the robot will connect to a new Wifi.
+                        {t("connectivity.wifi.applyingDialogText")}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => {
                         window.location.reload();
                     }} autoFocus>
-                        OK
+                        {t("common.ok")}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -364,6 +362,8 @@ const WifiConnectivity = (): React.ReactElement => {
 };
 
 const WifiConnectivityPage = (): React.ReactElement => {
+    const {t} = useTranslation();
+
     const {
         isFetching: wifiStatusFetching,
         refetch: refetchWifiStatus,
@@ -374,7 +374,7 @@ const WifiConnectivityPage = (): React.ReactElement => {
             <Grid2 container direction="row">
                 <Box style={{width: "100%"}}>
                     <DetailPageHeaderRow
-                        title="Wi-Fi Connectivity"
+                        title={t("connectivity.wifi.title")}
                         icon={<WifiIcon/>}
                         onRefreshClick={() => {
                             refetchWifiStatus().catch(() => {

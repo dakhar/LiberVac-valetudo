@@ -13,6 +13,7 @@ import HelpAction from "./actions/edit_map_actions/HelpAction";
 import {ProviderContext} from "notistack";
 import React from "react";
 import {PathDrawer} from "./PathDrawer";
+import i18n from "../i18n";
 
 export type mode = "segments" | "virtual_restrictions";
 
@@ -495,7 +496,7 @@ class EditMap extends BaseMap<EditMapProps, EditMapState> {
                             onSave={() => {
                                 this.pendingVirtualRestrictionsStructuresUpdate = true;
 
-                                this.props.enqueueSnackbar("Saved successfully", {
+                                this.props.enqueueSnackbar(i18n.t("map.savedSuccessfully"), {
                                     preventDuplicate: true,
                                     key: "virtual_restrictions_saved",
                                     variant: "info",

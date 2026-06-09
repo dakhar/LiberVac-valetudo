@@ -23,6 +23,7 @@ import {
     Typography,
 } from "@mui/material";
 import { Add as AddIcon, Remove as RemoveIcon } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 import { deepCopy } from "../../utils";
 
@@ -40,7 +41,9 @@ export const validateParams: Record<
 
 export const ActionFallbackControls: FunctionComponent<TimerActionControlProps> =
     () => {
-        return <Typography color="error">The currently configured action does not exist. Please select a different action.</Typography>;
+        const { t } = useTranslation();
+
+        return <Typography color="error">{t("timers.actionDoesNotExist")}</Typography>;
     };
 
 
@@ -55,6 +58,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
     params,
     setParams
 }) => {
+    const { t } = useTranslation();
     const segmentIds: Array<string> = React.useMemo(() => {
         return (params.segment_ids as Array<string>) || [];
     }, [params.segment_ids]);
@@ -80,10 +84,10 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
             return (
                 segments.find((s) => {
                     return s.id === segmentId;
-                })?.name || "Unnamed segment: " + segmentId
+                })?.name || t("timers.unnamedSegment", {id: segmentId})
             );
         },
-        [segments]
+        [segments, t]
     );
 
     const selectedSegmentList = React.useMemo(() => {
@@ -155,13 +159,13 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
                         <ListItemText
                             primary={
                                 segment.name ||
-                                    "Unnamed segment: " + segment.id
+                                    t("timers.unnamedSegment", {id: segment.id})
                             }
                         />
                     </ListItem>
                 );
             });
-    }, [disabled, params, segmentIds, setParams, segments]);
+    }, [disabled, params, segmentIds, setParams, segments, t]);
 
     if (segmentationPropsPending || segmentsPending) {
         return <CircularProgress />;
@@ -175,7 +179,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
     ) {
         return (
             <Typography color="error">
-                    Error loading {Capability.MapSegmentation}
+                    {t("timers.errorLoadingCapability", {capability: Capability.MapSegmentation})}
             </Typography>
         );
     }
@@ -188,7 +192,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
     ) {
         iterationItems.push(
             <MenuItem key={i} value={i}>
-                {i} {i === 1 ? "Iteration" : "Iterations"}
+                {t("timers.iterationCount", {count: i})}
             </MenuItem>
         );
     }
@@ -200,14 +204,14 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
         <>
             <FormControl>
                 <InputLabel id="segment-iterations-label">
-                        Iterations
+                        {t("timers.iterations")}
                 </InputLabel>
                 <Select
                     labelId="segment-iterations-label"
                     id="segment-iterations-select"
                     value={iterationCount}
                     disabled={disabled}
-                    label="Iterations"
+                    label={t("timers.iterations")}
                     onChange={(e) => {
                         const newParams = deepCopy(params);
                         newParams.iterations = e.target.value;
@@ -233,7 +237,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
                             }}
                         />
                     }
-                    label="Use custom order"
+                    label={t("timers.useCustomOrder")}
                 />
             )}
             <Box pt={1} />
@@ -242,7 +246,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
                 dense
                 subheader={
                     <ListSubheader component="div" sx={{userSelect: "none"}}>
-                            Available segments
+                            {t("timers.availableSegments")}
                     </ListSubheader>
                 }
             >
@@ -253,7 +257,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
                 dense
                 subheader={
                     <ListSubheader component="div" sx={{userSelect: "none"}}>
-                            Selected segments
+                            {t("timers.selectedSegments")}
                     </ListSubheader>
                 }
             >

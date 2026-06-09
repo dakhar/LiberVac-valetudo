@@ -1,5 +1,6 @@
 import {Capability, PresetSelectionState, PresetValue} from "./api";
 import React, {ReactElement} from "react";
+import i18n from "./i18n";
 import {
     FanSpeedHighIcon,
     FanSpeedLowIcon,
@@ -43,6 +44,12 @@ export const presetFriendlyNames: {[key in PresetValue]: string} = Object.freeze
     "mop": "Mop"
 });
 
+// Localized display label for a preset value (fan speed / water grade / operation mode).
+// Falls back to the English presetFriendlyNames entry for unknown values.
+export const localizePreset = (preset: PresetValue): string => {
+    return i18n.t(`presets.${preset}`, {defaultValue: presetFriendlyNames[preset] ?? preset});
+};
+
 export function getPresetIconOrLabel(capability: Capability, preset: PresetValue, style?: React.CSSProperties): ReactElement | string {
     switch (capability) {
         case Capability.FanSpeedControl:
@@ -62,7 +69,7 @@ export function getPresetIconOrLabel(capability: Capability, preset: PresetValue
                 case "turbo":
                     return <FanSpeedTurboIcon style={style}/>;
                 default:
-                    return presetFriendlyNames[preset];
+                    return localizePreset(preset);
 
             }
         case Capability.WaterUsageControl:
@@ -80,7 +87,7 @@ export function getPresetIconOrLabel(capability: Capability, preset: PresetValue
                 case "max":
                     return <WaterGradeMaxIcon style={style}/>;
                 default:
-                    return presetFriendlyNames[preset];
+                    return localizePreset(preset);
             }
         case Capability.OperationModeControl:
             switch (preset) {
@@ -93,9 +100,9 @@ export function getPresetIconOrLabel(capability: Capability, preset: PresetValue
                 case "vacuum_then_mop":
                     return <OperationModeVacuumThenMop style={style}/>;
                 default:
-                    return presetFriendlyNames[preset];
+                    return localizePreset(preset);
             }
         default:
-            return presetFriendlyNames[preset];
+            return localizePreset(preset);
     }
 }

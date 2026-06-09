@@ -11,7 +11,9 @@ import {
 import {LinearProgress, Skeleton} from "@mui/material";
 import {ButtonListMenuItem} from "../components/list_menu/ButtonListMenuItem";
 import {convertSecondsToHumans, getConsumableName} from "../utils";
-import {ConsumablesHelp} from "./res/ConsumablesHelp";
+import {ConsumablesHelp, ConsumablesHelpRu} from "./res/ConsumablesHelp";
+import {useTranslation} from "react-i18next";
+import i18n from "../i18n";
 
 const ConsumableButtonListMenuItem: React.FunctionComponent<{
     consumable: ConsumableMeta,
@@ -20,22 +22,27 @@ const ConsumableButtonListMenuItem: React.FunctionComponent<{
     consumable,
     state
 }): React.ReactElement => {
+    const {t} = useTranslation();
     const {
         mutate: resetConsumable,
         isPending: resetConsumableIsExecuting
     } = useConsumableResetMutation();
+
+    const consumableName = getConsumableName(consumable.type, consumable.subType, t);
 
     let secondaryLabel = "";
     let buttonColor : "warning" | "error" | undefined;
     let secondaryLabelElement : React.ReactElement | undefined;
 
     if (state) {
-        secondaryLabel = "Remaining: ";
-        secondaryLabel += state.remaining.unit === "minutes" ? convertSecondsToHumans(60 * state.remaining.value, false) : `${state.remaining.value} %`;
+        const remainingValue = state.remaining.unit === "minutes" ?
+            convertSecondsToHumans(60 * state.remaining.value, false) :
+            `${state.remaining.value} %`;
+        secondaryLabel = `${t("consumables.remaining")}: ${remainingValue}`;
 
         if (state.remaining.value <= 0) {
             buttonColor = "warning";
-            secondaryLabel = "Depleted";
+            secondaryLabel = t("consumables.depleted");
         }
 
 
@@ -70,13 +77,13 @@ const ConsumableButtonListMenuItem: React.FunctionComponent<{
 
     return (
         <ButtonListMenuItem
-            primaryLabel={getConsumableName(consumable.type, consumable.subType)}
+            primaryLabel={consumableName}
             secondaryLabel={secondaryLabelElement ?? secondaryLabel}
-            buttonLabel="Reset"
+            buttonLabel={t("consumables.reset")}
             buttonColor={buttonColor}
             confirmationDialog={{
-                title: "Reset consumable?",
-                body: `Do you really want to reset the ${getConsumableName(consumable.type, consumable.subType)} consumable?`
+                title: t("consumables.resetConfirmTitle"),
+                body: t("consumables.resetConfirmBody", {name: consumableName})
             }}
             action={() => {
                 resetConsumable(consumable);
@@ -87,6 +94,7 @@ const ConsumableButtonListMenuItem: React.FunctionComponent<{
 };
 
 const Consumables = (): React.ReactElement => {
+    const {t} = useTranslation();
     const {
         data: consumableProperties,
         isPending: consumablePropertiesPending,
@@ -118,10 +126,10 @@ const Consumables = (): React.ReactElement => {
     return (
         <PaperContainer>
             <ListMenu
-                primaryHeader={"Consumables"}
-                secondaryHeader={"Monitor and reset consumable states"}
+                primaryHeader={t("consumables.title")}
+                secondaryHeader={t("consumables.subtitle")}
                 listItems={listItems}
-                helpText={ConsumablesHelp}
+                helpText={i18n.language?.toLowerCase().startsWith("ru") ? ConsumablesHelpRu : ConsumablesHelp}
             />
             {
                 (consumablePropertiesPending || consumablesDataPending) &&

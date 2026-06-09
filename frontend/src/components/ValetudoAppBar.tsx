@@ -10,7 +10,9 @@ import {
     ListItemIcon,
     ListItemText,
     ListSubheader,
+    MenuItem,
     PaletteMode,
+    Select,
     Switch,
     Toolbar,
     Typography
@@ -35,7 +37,7 @@ import {
     Wysiwyg as SystemInformationIcon,
     Info as AboutIcon,
     Help as HelpIcon,
-    SmartToy as AiIcon,
+    Translate as TranslateIcon,
     SvgIconComponent
 } from "@mui/icons-material";
 import {Link, useLocation} from "react-router-dom";
@@ -47,13 +49,15 @@ import {
     SwaggerUIIcon,
     ValetudoMonochromeIcon
 } from "./CustomIcons";
+import {useTranslation} from "react-i18next";
+import {SUPPORTED_LANGUAGES, SupportedLanguage} from "../i18n";
 
 interface MenuEntry {
     kind: "MenuEntry";
     route: string;
-    title: string;
+    titleKey: string;
     menuIcon: SvgIconComponent;
-    menuText: string;
+    menuTextKey: string;
     requiredCapabilities?: {
         capabilities: Capability[];
         type: "allof" | "anyof"
@@ -63,33 +67,31 @@ interface MenuEntry {
 interface MenuSubEntry {
     kind: "MenuSubEntry",
     route: string,
-    title: string,
+    titleKey: string,
     parentRoute: string
 }
 
 interface MenuSubheader {
     kind: "Subheader";
-    title: string;
+    titleKey: string;
     requiredCapabilities?: {
         capabilities: Capability[];
         type: "allof" | "anyof"
     };
 }
 
-
-
 //Note that order is important here
 const menuTree: Array<MenuEntry | MenuSubEntry | MenuSubheader> = [
     {
         kind: "MenuEntry",
         route: "/",
-        title: "Home",
+        titleKey: "nav.titles.home",
         menuIcon: HomeIcon,
-        menuText: "Home"
+        menuTextKey: "nav.home"
     },
     {
         kind: "Subheader",
-        title: "Robot",
+        titleKey: "nav.robot",
         requiredCapabilities: {
             capabilities: [
                 Capability.ConsumableMonitoring,
@@ -103,9 +105,9 @@ const menuTree: Array<MenuEntry | MenuSubEntry | MenuSubheader> = [
     {
         kind: "MenuEntry",
         route: "/robot/consumables",
-        title: "Consumables",
+        titleKey: "nav.titles.consumables",
         menuIcon: PendingActionsIcon,
-        menuText: "Consumables",
+        menuTextKey: "nav.consumables",
         requiredCapabilities: {
             capabilities: [Capability.ConsumableMonitoring],
             type: "allof"
@@ -114,9 +116,9 @@ const menuTree: Array<MenuEntry | MenuSubEntry | MenuSubheader> = [
     {
         kind: "MenuEntry",
         route: "/robot/manual_control",
-        title: "Manual control",
+        titleKey: "nav.titles.manualControl",
         menuIcon: SettingsRemoteIcon,
-        menuText: "Manual control",
+        menuTextKey: "nav.manualControl",
         requiredCapabilities: {
             capabilities: [Capability.ManualControl, Capability.HighResolutionManualControl],
             type: "anyof"
@@ -125,9 +127,9 @@ const menuTree: Array<MenuEntry | MenuSubEntry | MenuSubheader> = [
     {
         kind: "MenuEntry",
         route: "/robot/total_statistics",
-        title: "Statistics",
+        titleKey: "nav.titles.statistics",
         menuIcon: StatisticsIcon,
-        menuText: "Statistics",
+        menuTextKey: "nav.statistics",
         requiredCapabilities: {
             capabilities: [Capability.TotalStatistics],
             type: "allof"
@@ -135,14 +137,14 @@ const menuTree: Array<MenuEntry | MenuSubEntry | MenuSubheader> = [
     },
     {
         kind: "Subheader",
-        title: "Options"
+        titleKey: "nav.options"
     },
     {
         kind: "MenuEntry",
         route: "/options/map_management",
-        title: "Map Options",
+        titleKey: "nav.titles.mapOptions",
         menuIcon: MapManagementIcon,
-        menuText: "Map",
+        menuTextKey: "nav.mapOptions",
         requiredCapabilities: {
             capabilities: [
                 Capability.PersistentMapControl,
@@ -160,136 +162,129 @@ const menuTree: Array<MenuEntry | MenuSubEntry | MenuSubheader> = [
     {
         kind: "MenuSubEntry",
         route: "/options/map_management/segments",
-        title: "Segment Management",
+        titleKey: "nav.titles.segmentManagement",
         parentRoute: "/options/map_management"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/map_management/virtual_restrictions",
-        title: "Virtual Restriction Management",
+        titleKey: "nav.titles.virtualRestrictionManagement",
         parentRoute: "/options/map_management"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/map_management/robot_coverage",
-        title: "Robot Coverage Map",
+        titleKey: "nav.titles.robotCoverageMap",
         parentRoute: "/options/map_management"
     },
     {
         kind: "MenuEntry",
         route: "/options/connectivity",
-        title: "Connectivity Options",
+        titleKey: "nav.titles.connectivityOptions",
         menuIcon: ConnectivityIcon,
-        menuText: "Connectivity"
+        menuTextKey: "nav.connectivity"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/connectivity/auth",
-        title: "Auth Settings",
+        titleKey: "nav.titles.authSettings",
         parentRoute: "/options/connectivity"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/connectivity/mqtt",
-        title: "MQTT Connectivity",
+        titleKey: "nav.titles.mqttConnectivity",
         parentRoute: "/options/connectivity"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/connectivity/networkadvertisement",
-        title: "Network Advertisement",
+        titleKey: "nav.titles.networkAdvertisement",
         parentRoute: "/options/connectivity"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/connectivity/ntp",
-        title: "NTP Connectivity",
+        titleKey: "nav.titles.ntpConnectivity",
         parentRoute: "/options/connectivity"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/connectivity/wifi",
-        title: "Wi-Fi Connectivity",
+        titleKey: "nav.titles.wifiConnectivity",
         parentRoute: "/options/connectivity"
     },
     {
         kind: "MenuEntry",
         route: "/options/robot",
-        title: "Robot Options",
+        titleKey: "nav.titles.robotOptions",
         menuIcon: RobotMonochromeIcon,
-        menuText: "Robot"
+        menuTextKey: "nav.robotOptions"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/robot/system",
-        title: "System Options",
+        titleKey: "nav.titles.systemOptions",
         parentRoute: "/options/robot"
     },
     {
         kind: "MenuSubEntry",
         route: "/options/robot/quirks",
-        title: "Quirks",
+        titleKey: "nav.titles.quirks",
         parentRoute: "/options/robot"
     },
     {
         kind: "MenuEntry",
         route: "/options/valetudo",
-        title: "Valetudo Options",
+        titleKey: "nav.titles.valetudoOptions",
         menuIcon: ValetudoMonochromeIcon,
-        menuText: "Valetudo"
+        menuTextKey: "nav.valetudoOptions"
     },
     {
         kind: "Subheader",
-        title: "Misc"
+        titleKey: "nav.misc"
     },
     {
         kind: "MenuEntry",
         route: "/valetudo/timers",
-        title: "Timers",
+        titleKey: "nav.titles.timers",
         menuIcon: TimeIcon,
-        menuText: "Timers"
+        menuTextKey: "nav.timers"
     },
     {
         kind: "MenuEntry",
         route: "/valetudo/log",
-        title: "Log",
+        titleKey: "nav.titles.log",
         menuIcon: LogIcon,
-        menuText: "Log"
+        menuTextKey: "nav.log"
     },
     {
         kind: "MenuEntry",
         route: "/valetudo/updater",
-        title: "Updater",
+        titleKey: "nav.titles.updater",
         menuIcon: UpdaterIcon,
-        menuText: "Updater"
+        menuTextKey: "nav.updater"
     },
     {
         kind: "MenuEntry",
         route: "/valetudo/system_information",
-        title: "System Information",
+        titleKey: "nav.titles.systemInformation",
         menuIcon: SystemInformationIcon,
-        menuText: "System Information"
-    },
-    {
-        kind: "MenuEntry",
-        route: "/valetudo/ai",
-        title: "AI Assistant",
-        menuIcon: AiIcon,
-        menuText: "AI Assistant"
+        menuTextKey: "nav.systemInformation"
     },
     {
         kind: "MenuEntry",
         route: "/valetudo/help",
-        title: "General Help",
+        titleKey: "nav.titles.generalHelp",
         menuIcon: HelpIcon,
-        menuText: "General Help"
+        menuTextKey: "nav.generalHelp"
     },
     {
         kind: "MenuEntry",
         route: "/valetudo/about",
-        title: "About Valetudo",
+        titleKey: "nav.titles.aboutValetudo",
         menuIcon: AboutIcon,
-        menuText: "About Valetudo"
+        menuTextKey: "nav.aboutValetudo"
     },
 ];
 
@@ -297,6 +292,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
     paletteMode,
     setPaletteMode
 }): React.ReactElement => {
+    const {t, i18n} = useTranslation();
     const [drawerOpen, setDrawerOpen] = React.useState<boolean>(false);
     const currentLocation = useLocation()?.pathname;
     const robotCapabilities = useCapabilitiesSupported(...Object.values(Capability));
@@ -309,12 +305,12 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
 
         menuTree.forEach((element) => {
             //@ts-ignore
-            if (currentLocation.includes(element.route) && element.route !== "/" && element.title) {
+            if (currentLocation.includes(element.route) && element.route !== "/" && element.titleKey) {
                 if (ret !== "") {
                     ret += " - ";
                 }
 
-                ret += element.title;
+                ret += t(element.titleKey);
             }
         });
 
@@ -324,8 +320,8 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
             document.title = "Valetudo";
         }
 
-        return currentMenuEntry.title;
-    }, [currentLocation, currentMenuEntry]);
+        return t(currentMenuEntry.titleKey);
+    }, [currentLocation, currentMenuEntry, t]);
 
     const drawerContent = React.useMemo(() => {
         return (
@@ -384,7 +380,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                                         disableSticky={true}
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        {value.title}
+                                        {t(value.titleKey)}
                                     </ListSubheader>
                                 );
 
@@ -426,7 +422,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                                         <ListItemIcon>
                                             <ItemIcon/>
                                         </ListItemIcon>
-                                        <ListItemText primary={value.menuText}/>
+                                        <ListItemText primary={t(value.menuTextKey)}/>
                                     </ListItemButton>
                                 );
                             }
@@ -443,7 +439,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                         <ListItemIcon>
                             <DarkModeIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Dark mode"/>
+                        <ListItemText primary={t("nav.darkMode")}/>
                         <Switch
                             edge="end"
                             onChange={(e) => {
@@ -451,6 +447,32 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                             }}
                             checked={paletteMode === "dark"}
                         />
+                    </ListItem>
+
+                    <ListItem
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{
+                            userSelect: "none"
+                        }}
+                    >
+                        <ListItemIcon>
+                            <TranslateIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary={t("nav.language") ?? "Language"}/>
+                        <Select
+                            size="small"
+                            value={i18n.resolvedLanguage ?? "en"}
+                            onChange={(e) => {
+                                void i18n.changeLanguage(e.target.value as SupportedLanguage);
+                            }}
+                            variant="standard"
+                            disableUnderline
+                            sx={{minWidth: 80}}
+                        >
+                            {Object.entries(SUPPORTED_LANGUAGES).map(([code, label]) => (
+                                <MenuItem key={code} value={code}>{label}</MenuItem>
+                            ))}
+                        </Select>
                     </ListItem>
 
 
@@ -461,7 +483,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                         }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        Links
+                        {t("nav.links")}
                     </ListSubheader>
                     <ListItemButton
                         component="a"
@@ -486,7 +508,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                         <ListItemIcon>
                             <DocsIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Docs"/>
+                        <ListItemText primary={t("nav.docs")}/>
                     </ListItemButton>
                     <ListItemButton
                         component="a"
@@ -510,14 +532,14 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                         <ListItemIcon>
                             <DonateIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Donate"/>
+                        <ListItemText primary={t("nav.donate")}/>
                     </ListItemButton>
 
 
                 </List>
             </Box>
         );
-    }, [currentLocation, paletteMode, setPaletteMode, robotCapabilities]);
+    }, [currentLocation, paletteMode, setPaletteMode, robotCapabilities, t, i18n]);
 
     const toolbarContent = React.useMemo(() => {
         switch (currentMenuEntry.kind) {
@@ -528,12 +550,12 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                             size="large"
                             edge="start"
                             color="inherit"
-                            aria-label="menu"
+                            aria-label={t("common.menu")}
                             sx={{mr: 2}}
                             onClick={() => {
                                 setDrawerOpen(true);
                             }}
-                            title="Menu"
+                            title={t("common.menu")}
                         >
                             <MenuIcon/>
                         </IconButton>
@@ -549,7 +571,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                             size="large"
                             edge="start"
                             color="inherit"
-                            aria-label="back"
+                            aria-label={t("common.back")}
                             sx={{mr: 2}}
 
                             component={Link}
@@ -566,7 +588,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                 //This can never happen
                 return (<></>);
         }
-    }, [currentMenuEntry, setDrawerOpen, pageTitle]);
+    }, [currentMenuEntry, setDrawerOpen, pageTitle, t]);
 
     return (
         <Box

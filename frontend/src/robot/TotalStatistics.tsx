@@ -19,6 +19,7 @@ import {adjustHexColorBrightness, getFriendlyStatName, getHumanReadableStatValue
 import {History as HistoryIcon} from "@mui/icons-material";
 import {StatisticsAchievement, statisticsAchievements} from "./res/StatisticsAchievements";
 import {useIsMobileView} from "../hooks";
+import {useTranslation} from "react-i18next";
 
 const achievementColors = {
     light: {
@@ -44,6 +45,7 @@ achievementColors.dark = {
 };
 
 const StatisticsGridItem: React.FunctionComponent<{ dataPoint: ValetudoDataPoint}> = ({ dataPoint}): React.ReactElement => {
+    const {t} = useTranslation();
     const [overviewDialogOpen, setOverviewDialogOpen] = React.useState(false);
     const mobileView = useIsMobileView();
 
@@ -81,7 +83,7 @@ const StatisticsGridItem: React.FunctionComponent<{ dataPoint: ValetudoDataPoint
                                         }}
                                     >
                                         <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
-                                            {`Total ${getFriendlyStatName(dataPoint)}`}
+                                            {`Total ${getFriendlyStatName(dataPoint, t)}`}
                                         </Typography>
                                         <Typography variant="h5" component="div">
                                             {getHumanReadableStatValue(dataPoint)}
@@ -113,7 +115,7 @@ const StatisticsGridItem: React.FunctionComponent<{ dataPoint: ValetudoDataPoint
                 fullScreen={mobileView}
             >
                 <DialogTitle style={{userSelect: "none"}}>
-                    {getFriendlyStatName(dataPoint)} Achievements
+                    {getFriendlyStatName(dataPoint, t)} Achievements
                 </DialogTitle>
 
                 <DialogContent dividers>

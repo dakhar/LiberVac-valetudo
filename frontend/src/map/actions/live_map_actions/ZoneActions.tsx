@@ -5,6 +5,7 @@ import {
     useZonePropertiesQuery,
 } from "../../../api";
 import React from "react";
+import {useTranslation} from "react-i18next";
 import {Box, Button, CircularProgress, Container, Grid2, Typography} from "@mui/material";
 import { useLongPress } from "use-long-press";
 import {ActionButton} from "../../Styled";
@@ -32,6 +33,7 @@ const ZoneActions = (
     props: ZoneActionsProperties
 ): React.ReactElement => {
     const { zones, convertPixelCoordinatesToCMSpace, onClear, onAdd } = props;
+    const {t} = useTranslation();
     const [iterationCount, setIterationCount] = React.useState(1);
     const [integrationHelpDialogOpen, setIntegrationHelpDialogOpen] = React.useState(false);
     const [integrationHelpDialogPayload, setIntegrationHelpDialogPayload] = React.useState("");
@@ -123,13 +125,13 @@ const ZoneActions = (
         return (
             <Container>
                 <Typography color="error">
-                    Error loading {Capability.ZoneCleaning} properties
+                    {t("mapActions.errorLoadingProperties", {capability: Capability.ZoneCleaning})}
                 </Typography>
                 <Box m={1}/>
                 <Button color="primary" variant="contained" onClick={() => {
                     return refetchZoneProperties();
                 }}>
-                    Retry
+                    {t("mapActions.retry")}
                 </Button>
             </Container>
         );
@@ -147,7 +149,7 @@ const ZoneActions = (
         return (
             <Container>
                 <Typography align="center">
-                    No {Capability.ZoneCleaning} properties
+                    {t("mapActions.noProperties", {capability: Capability.ZoneCleaning})}
                 </Typography>
                 ;
             </Container>
@@ -166,7 +168,7 @@ const ZoneActions = (
                         {...setupClickHandlers()}
                     >
                         <GoIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Clean {zones.length} zones
+                        {t("mapActions.zones.cleanZones", {count: zones.length})}
                         {cleanTemporaryZonesIsExecuting && (
                             <CircularProgress
                                 color="inherit"
@@ -187,7 +189,7 @@ const ZoneActions = (
                                 textTransform: "initial"
                             }}
                             onClick={handleIterationToggle}
-                            title="Iteration Count"
+                            title={t("mapActions.iterationCount")}
                         >
                             <IterationsIcon iterationCount={iterationCount}/>
                         </ActionButton>
@@ -202,7 +204,7 @@ const ZoneActions = (
                         onClick={onAdd}
                     >
                         <AddIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Add ({zones.length}/{zoneProperties.zoneCount.max})
+                        {t("mapActions.zones.add", {current: zones.length, max: zoneProperties.zoneCount.max})}
                     </ActionButton>
                 </Grid2>
                 {
@@ -216,7 +218,7 @@ const ZoneActions = (
                             onClick={onClear}
                         >
                             <ClearIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                            Clear
+                            {t("mapActions.clear")}
                         </ActionButton>
                     </Grid2>
                 }
@@ -224,7 +226,7 @@ const ZoneActions = (
                     (didSelectZones && !canClean) &&
                     <Grid2>
                         <Typography variant="caption" color="textSecondary">
-                            Cannot start zone cleaning while the robot is busy
+                            {t("mapActions.zones.cannotCleanWhileBusy")}
                         </Typography>
                     </Grid2>
                 }
@@ -235,7 +237,7 @@ const ZoneActions = (
                     setIntegrationHelpDialogOpen(open);
                 }}
                 coordinatesWarning={true}
-                helperText={"To start a cleanup of the currently drawn zones with the currently configured parameters via MQTT or REST, simply use this payload."}
+                helperText={t("mapActions.zones.integrationHelp")}
                 payload={integrationHelpDialogPayload}
             />
         </>

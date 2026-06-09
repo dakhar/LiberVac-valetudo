@@ -1,5 +1,6 @@
 import {Capability, useCleanSegmentsMutation, useMapSegmentationPropertiesQuery, useRobotStatusQuery} from "../../../api";
 import React from "react";
+import {useTranslation} from "react-i18next";
 import {Box, Button, CircularProgress, Container, Grid2, Typography} from "@mui/material";
 import {ActionButton} from "../../Styled";
 import IntegrationHelpDialog from "../../../components/IntegrationHelpDialog";
@@ -20,6 +21,7 @@ const SegmentActions = (
     props: SegmentActionsProperties
 ): React.ReactElement => {
     const {segments, onClear} = props;
+    const {t} = useTranslation();
     const [iterationCount, setIterationCount] = React.useState(1);
     const [integrationHelpDialogOpen, setIntegrationHelpDialogOpen] = React.useState(false);
     const [integrationHelpDialogPayload, setIntegrationHelpDialogPayload] = React.useState("");
@@ -89,13 +91,13 @@ const SegmentActions = (
         return (
             <Container>
                 <Typography color="error">
-                    Error loading {Capability.MapSegmentation} properties
+                    {t("mapActions.errorLoadingProperties", {capability: Capability.MapSegmentation})}
                 </Typography>
                 <Box m={1}/>
                 <Button color="primary" variant="contained" onClick={() => {
                     return refetchMapSegmentationProperties();
                 }}>
-                    Retry
+                    {t("mapActions.retry")}
                 </Button>
             </Container>
         );
@@ -113,7 +115,7 @@ const SegmentActions = (
         return (
             <Container>
                 <Typography align="center">
-                    No {Capability.MapSegmentation} properties
+                    {t("mapActions.noProperties", {capability: Capability.MapSegmentation})}
                 </Typography>
                 ;
             </Container>
@@ -134,7 +136,7 @@ const SegmentActions = (
                         {...setupClickHandlers()}
                     >
                         <GoIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Clean {segments.length} segments
+                        {t("mapActions.segments.cleanSegments", {count: segments.length})}
                         {segmentActionExecuting && (
                             <CircularProgress
                                 color="inherit"
@@ -155,7 +157,7 @@ const SegmentActions = (
                                 textTransform: "initial"
                             }}
                             onClick={handleIterationToggle}
-                            title="Iteration Count"
+                            title={t("mapActions.iterationCount")}
                         >
                             <IterationsIcon iterationCount={iterationCount}/>
                         </ActionButton>
@@ -171,7 +173,7 @@ const SegmentActions = (
                             onClick={onClear}
                         >
                             <ClearIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                            Clear
+                            {t("mapActions.clear")}
                         </ActionButton>
                     </Grid2>
                 }
@@ -179,7 +181,7 @@ const SegmentActions = (
                     (didSelectSegments && !canClean) &&
                     <Grid2>
                         <Typography variant="caption" color="textSecondary">
-                            Cannot start segment cleaning while the robot is busy
+                            {t("mapActions.segments.cannotCleanWhileBusy")}
                         </Typography>
                     </Grid2>
                 }
@@ -190,7 +192,7 @@ const SegmentActions = (
                     setIntegrationHelpDialogOpen(open);
                 }}
                 coordinatesWarning={false}
-                helperText={"To start a cleanup of the currently selected segments with the currently configured parameters via MQTT or REST, simply use this payload."}
+                helperText={t("mapActions.segments.integrationHelp")}
                 payload={integrationHelpDialogPayload}
             />
         </>

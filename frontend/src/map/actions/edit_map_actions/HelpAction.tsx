@@ -1,4 +1,5 @@
 import React from "react";
+import {useTranslation} from "react-i18next";
 import {Box, styled} from "@mui/material";
 import {ActionButton} from "../../Styled";
 import {
@@ -22,6 +23,8 @@ const ModeSwitchAction: React.FunctionComponent<{ helpDialogOpen: boolean, setHe
         setHelpDialogOpen
     }
 ): React.ReactElement => {
+    const {t} = useTranslation();
+
     return (
         <HelpButtonContainer>
             <ActionButton
@@ -31,7 +34,7 @@ const ModeSwitchAction: React.FunctionComponent<{ helpDialogOpen: boolean, setHe
                 onClick={() => {
                     setHelpDialogOpen(true);
                 }}
-                title="Help"
+                title={t("mapActions.edit.help")}
             >
                 <HelpIcon/>
             </ActionButton>

@@ -8,6 +8,7 @@ import {
 import React from "react";
 import {TransitionProps} from "@mui/material/transitions";
 import {LiveMapMode} from "./LiveMap";
+import {useTranslation} from "react-i18next";
 
 const LiveMapModeButtonContainer = styled(Box)(({theme}) => {
     return {
@@ -51,11 +52,11 @@ const modeToIcon: Record<LiveMapMode, React.ReactElement> = {
     "none": <NoneModeIcon/>
 };
 
-const modeToLabel: Record<LiveMapMode, string> = {
-    "segments": "Segments",
-    "zones": "Zones",
-    "goto": "Go To",
-    "none": "None"
+const modeToLabelKey: Record<LiveMapMode, string> = {
+    "segments": "map.mode.segments",
+    "zones": "map.mode.zones",
+    "goto": "map.mode.goTo",
+    "none": "map.mode.none"
 };
 
 /* eslint-disable react/display-name */
@@ -77,6 +78,7 @@ export const LiveMapModeSwitcher : React.FunctionComponent<{
     currentMode,
     setMode
 }) => {
+    const {t} = useTranslation();
     const [open, setOpen] = React.useState(false);
 
     return (
@@ -87,9 +89,9 @@ export const LiveMapModeSwitcher : React.FunctionComponent<{
                     setOpen(!open);
                 }}
                 icon={modeToIcon[currentMode]}
-                title="Map Mode Selector"
+                title={t("map.mapModeSelector")}
                 FabProps={{ size: "small" }}
-                ariaLabel="Map Mode Selector"
+                ariaLabel={t("map.mapModeSelector")}
                 direction="down"
                 TransitionComponent={NoTransition}
             >
@@ -97,7 +99,7 @@ export const LiveMapModeSwitcher : React.FunctionComponent<{
                     <SpeedDialAction
                         key={mode}
                         tooltipOpen
-                        tooltipTitle={modeToLabel[mode]}
+                        tooltipTitle={t(modeToLabelKey[mode])}
                         icon={modeToIcon[mode]}
                         onClick={() => {
                             setMode(mode);

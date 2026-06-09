@@ -21,8 +21,11 @@ import {
     AutoFixHigh as NetworkAdvertisementIcon
 } from "@mui/icons-material";
 import DetailPageHeaderRow from "../../components/DetailPageHeaderRow";
+import {useTranslation} from "react-i18next";
 
 const NetworkAdvertisementSettings = (): React.ReactElement => {
+    const {t} = useTranslation();
+
     const {
         data: storedConfiguration,
         isPending: configurationPending,
@@ -58,7 +61,7 @@ const NetworkAdvertisementSettings = (): React.ReactElement => {
     }
 
     if (configurationError || propertiesLoadError || !storedConfiguration) {
-        return <Typography color="error">Error loading Network Advertisement configuration</Typography>;
+        return <Typography color="error">{t("connectivity.networkAdvertisement.loadError")}</Typography>;
     }
 
     return (
@@ -74,14 +77,14 @@ const NetworkAdvertisementSettings = (): React.ReactElement => {
                         }}
                     />
                 }
-                label="Network Advertisement enabled"
+                label={t("connectivity.networkAdvertisement.enabled")}
                 sx={{mb: 1, marginTop: "1rem", userSelect: "none"}}
             />
             <Grid2 container spacing={1} sx={{mb: 1, mt: "1rem"}} direction="row">
                 <Grid2 style={{flexGrow: 1}}>
                     <TextField
                         style={{width: "100%"}}
-                        label="Zeroconf Hostname"
+                        label={t("connectivity.networkAdvertisement.zeroconfHostname")}
                         value={properties?.zeroconfHostname ?? ""}
                         variant="standard"
                         disabled={true}
@@ -100,16 +103,10 @@ const NetworkAdvertisementSettings = (): React.ReactElement => {
                 }}
             >
                 <Typography color="info">
-                    To allow quick autodiscovery by the companion apps, Valetudo advertises its presence on your
-                    local network using mDNS/Bonjour and SSDP/UPnP.
-                    It is not recommended to disable this feature, as it will break those companion apps.
+                    {t("connectivity.networkAdvertisement.infoLine1")}
                     <br/><br/>
-                    One common pitfall of these &quot;it just works&quot; technologies is that they&apos;re incredibly hard to debug
-                    the moment they don&apos;t anymore. They&apos;re using Multicast broadcasts, which, by-default, cannot traverse
-                    subnet boundaries. It is also a networking feature obscure enough to still sometimes be broken
-                    by bad Wi-Fi driver or OS updates, misconfiguration or just broken hardware in general.<br/>
-                    They are, however, optional, as you just need to know the IP of the robot to talk with Valetudo.
-                    You can get that from your router&apos;s webinterface and then e.g., create a browser bookmark for it.
+                    {t("connectivity.networkAdvertisement.infoLine2")}<br/>
+                    {t("connectivity.networkAdvertisement.infoLine3")}
                 </Typography>
             </InfoBox>
 
@@ -128,7 +125,7 @@ const NetworkAdvertisementSettings = (): React.ReactElement => {
                             setConfigurationModified(false);
                         }}
                     >
-                        Save configuration
+                        {t("connectivity.common.saveConfiguration")}
                     </Button>
                 </Grid2>
             </Grid2>
@@ -137,12 +134,14 @@ const NetworkAdvertisementSettings = (): React.ReactElement => {
 };
 
 const NetworkAdvertisementSettingsPage = (): React.ReactElement => {
+    const {t} = useTranslation();
+
     return (
         <PaperContainer>
             <Grid2 container direction="row">
                 <Box style={{width: "100%"}}>
                     <DetailPageHeaderRow
-                        title="Network Advertisement"
+                        title={t("connectivity.networkAdvertisement.title")}
                         icon={<NetworkAdvertisementIcon/>}
                     />
 

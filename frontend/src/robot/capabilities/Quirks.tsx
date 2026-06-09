@@ -16,12 +16,15 @@ import {
     useSetQuirkValueMutation
 } from "../../api";
 
-import {QuirksHelp} from "./res/QuirksHelp";
+import {QuirksHelp, QuirksHelpRu} from "./res/QuirksHelp";
 import {Star as QuirksIcon} from "@mui/icons-material";
 import PaperContainer from "../../components/PaperContainer";
 import DetailPageHeaderRow from "../../components/DetailPageHeaderRow";
+import {useTranslation} from "react-i18next";
+import {localizeQuirkDescription, localizeQuirkOption, localizeQuirkTitle} from "../../i18n/quirks";
 
 const QuirkControl: FunctionComponent<{ quirk: Quirk, style?: React.CSSProperties }> = (props) => {
+    useTranslation(); // re-render on language change so the localized strings below update
     const {mutate: setQuirkValue, isPending: quirkValueSetting} = useSetQuirkValueMutation();
     const handleChange = React.useCallback(
         (event: SelectChangeEvent<string>) => {
@@ -59,7 +62,7 @@ const QuirkControl: FunctionComponent<{ quirk: Quirk, style?: React.CSSPropertie
                     }}
                 >
                     <Typography variant="body1" sx={{mb: 0}}>
-                        {props.quirk.title}
+                        {localizeQuirkTitle(props.quirk.id, props.quirk.title)}
                     </Typography>
                     <Divider sx={{mt: 1}} style={{marginBottom: "1rem"}}/>
                     <Select
@@ -76,7 +79,7 @@ const QuirkControl: FunctionComponent<{ quirk: Quirk, style?: React.CSSPropertie
                                         value={o}
                                         key={`${o}_${i}`}
                                     >
-                                        {o}
+                                        {localizeQuirkOption(props.quirk.id, o, o)}
                                     </MenuItem>
                                 );
                             })
@@ -87,7 +90,7 @@ const QuirkControl: FunctionComponent<{ quirk: Quirk, style?: React.CSSPropertie
                         sx={{mb: 1}}
                         style={{marginTop: "1rem"}}
                     >
-                        {props.quirk.description}
+                        {localizeQuirkDescription(props.quirk.id, props.quirk.description)}
                     </Typography>
                 </FormControl>
             </Paper>
@@ -96,6 +99,7 @@ const QuirkControl: FunctionComponent<{ quirk: Quirk, style?: React.CSSPropertie
 };
 
 const Quirks: FunctionComponent = () => {
+    const {t, i18n} = useTranslation();
     const {
         data: quirks,
         isError: quirksLoadingError,
@@ -108,7 +112,7 @@ const Quirks: FunctionComponent = () => {
         if (quirksLoadingError) {
             return (
                 <Typography color="error" style={{textAlign: "center"}}>
-                    Error loading quirks.
+                    {t("quirks.errorLoading")}
                 </Typography>
             );
         }
@@ -116,7 +120,7 @@ const Quirks: FunctionComponent = () => {
         if (!quirksPending && (!quirks || (Array.isArray(quirks) && quirks.length === 0))) {
             return (
                 <Typography style={{textAlign: "center"}}>
-                    No quirks. You might want to reload
+                    {t("quirks.none")}
                 </Typography>
             );
         }
@@ -127,7 +131,7 @@ const Quirks: FunctionComponent = () => {
 
 
         quirks.sort((qA, qB) => {
-            return qA.title.localeCompare(qB.title);
+            return localizeQuirkTitle(qA.id, qA.title).localeCompare(localizeQuirkTitle(qB.id, qB.title));
         });
 
         return (
@@ -145,7 +149,7 @@ const Quirks: FunctionComponent = () => {
         );
 
 
-    }, [quirksLoadingError, quirksPending, quirks]);
+    }, [quirksLoadingError, quirksPending, quirks, t, i18n.language]);
 
 
     return (
@@ -153,9 +157,9 @@ const Quirks: FunctionComponent = () => {
             <Grid2 container direction="row">
                 <Box style={{width: "100%"}}>
                     <DetailPageHeaderRow
-                        title="Quirks"
+                        title={t("quirks.title")}
                         icon={<QuirksIcon/>}
-                        helpText={QuirksHelp}
+                        helpText={i18n.language?.toLowerCase().startsWith("ru") ? QuirksHelpRu : QuirksHelp}
                         onRefreshClick={() => {
                             refetchQuirks().catch(() => {
                                 /* intentional */

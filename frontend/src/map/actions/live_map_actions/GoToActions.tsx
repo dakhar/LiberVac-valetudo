@@ -3,6 +3,7 @@ import {
     useRobotStatusQuery
 } from "../../../api";
 import React from "react";
+import {useTranslation} from "react-i18next";
 import {CircularProgress, Grid2, Typography} from "@mui/material";
 import {ActionButton} from "../../Styled";
 import GoToTargetClientStructure from "../../structures/client_structures/GoToTargetClientStructure";
@@ -27,6 +28,7 @@ const GoToActions = (
     props: GoToActionsProperties
 ): React.ReactElement => {
     const {goToTarget, convertPixelCoordinatesToCMSpace, onClear} = props;
+    const {t} = useTranslation();
     const [integrationHelpDialogOpen, setIntegrationHelpDialogOpen] = React.useState(false);
     const [integrationHelpDialogPayload, setIntegrationHelpDialogPayload] = React.useState("");
 
@@ -88,7 +90,7 @@ const GoToActions = (
                         {...setupClickHandlers()}
                     >
                         <GoIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Go To Location
+                        {t("mapActions.goto.goToLocation")}
                         {goToIsExecuting && (
                             <CircularProgress
                                 color="inherit"
@@ -108,7 +110,7 @@ const GoToActions = (
                             onClick={onClear}
                         >
                             <ClearIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                            Clear
+                            {t("mapActions.clear")}
                         </ActionButton>
                     }
                 </Grid2>
@@ -116,7 +118,7 @@ const GoToActions = (
                     !canGo &&
                     <Grid2>
                         <Typography variant="caption" color="textSecondary">
-                            Cannot go to point while the robot is busy
+                            {t("mapActions.goto.cannotGoWhileBusy")}
                         </Typography>
                     </Grid2>
                 }
@@ -126,7 +128,7 @@ const GoToActions = (
                 setDialogOpen={(open: boolean) => {
                     setIntegrationHelpDialogOpen(open);
                 }}
-                helperText={"To trigger a \"Go To\" to the currently selected location via MQTT or REST, simply use this payload."}
+                helperText={t("mapActions.goto.integrationHelp")}
                 coordinatesWarning={true}
                 payload={integrationHelpDialogPayload}
             />

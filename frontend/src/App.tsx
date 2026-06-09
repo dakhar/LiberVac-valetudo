@@ -11,6 +11,8 @@ import "@fontsource/ibm-plex-sans/400.css";
 import "@fontsource/ibm-plex-sans/500.css";
 import "@fontsource/ibm-plex-sans/700.css";
 import "@fontsource/jetbrains-mono/200.css";
+// i18n must be imported before any component that uses translations
+import "./i18n";
 
 const ANIMATION_SPEED = 2;
 const queryClient = new QueryClient();

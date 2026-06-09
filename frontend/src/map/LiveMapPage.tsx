@@ -4,6 +4,7 @@ import LiveMap from "./LiveMap";
 import {useCapabilitiesSupported} from "../CapabilitiesProvider";
 import React from "react";
 import {useQueryClient} from "@tanstack/react-query";
+import {useTranslation} from "react-i18next";
 
 
 const Container = styled(Box)({
@@ -54,16 +55,17 @@ const LiveMapPage = (props: Record<string, never> ): React.ReactElement => {
     } = useMapSegmentationPropertiesQuery(mapSegmentationCapabilitySupported);
 
     const theme = useTheme();
+    const {t} = useTranslation();
 
     if (mapLoadError) {
         return (
             <Container>
-                <Typography color="error">Error loading map data</Typography>
+                <Typography color="error">{t("map.errorLoadingMapData")}</Typography>
                 <Box m={1}/>
                 <Button color="primary" variant="contained" onClick={() => {
                     return refetchMap();
                 }}>
-                    Retry
+                    {t("map.retry")}
                 </Button>
             </Container>
         );
@@ -83,7 +85,7 @@ const LiveMapPage = (props: Record<string, never> ): React.ReactElement => {
     if (!mapData) {
         return (
             <Container>
-                <Typography align="center">No map data</Typography>;
+                <Typography align="center">{t("map.noMapData")}</Typography>;
             </Container>
         );
     }

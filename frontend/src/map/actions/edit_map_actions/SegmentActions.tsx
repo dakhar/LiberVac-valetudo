@@ -10,6 +10,8 @@ import {
     useSplitSegmentMutation
 } from "../../../api";
 import React from "react";
+import {useTranslation} from "react-i18next";
+import type {TFunction} from "i18next";
 import {
     Button,
     CircularProgress,
@@ -37,18 +39,18 @@ import {
 } from "@mui/icons-material";
 import {AddCuttingLineIcon, RenameIcon} from "../../../components/CustomIcons";
 
-const getMaterialLabel = (material: MapSegmentMaterial): string => {
+const getMaterialLabel = (material: MapSegmentMaterial, t: TFunction): string => {
     switch (material) {
         case MapSegmentMaterial.Generic:
-            return "Generic";
+            return t("mapActions.edit.material.generic");
         case MapSegmentMaterial.Tile:
-            return "Tile";
+            return t("mapActions.edit.material.tile");
         case MapSegmentMaterial.Wood:
-            return "Wood";
+            return t("mapActions.edit.material.wood");
         case MapSegmentMaterial.WoodHorizontal:
-            return "Wood (Horizontal)";
+            return t("mapActions.edit.material.woodHorizontal");
         case MapSegmentMaterial.WoodVertical:
-            return "Wood (Vertical)";
+            return t("mapActions.edit.material.woodVertical");
         default:
             return material;
     }
@@ -63,6 +65,7 @@ interface SegmentRenameDialogProps {
 
 const SegmentRenameDialog = (props: SegmentRenameDialogProps) => {
     const {open, onClose, currentName, onRename} = props;
+    const {t} = useTranslation();
     const [name, setName] = React.useState(currentName);
 
     React.useEffect(() => {
@@ -73,16 +76,16 @@ const SegmentRenameDialog = (props: SegmentRenameDialogProps) => {
 
     return (
         <Dialog open={open} onClose={onClose} sx={{userSelect: "none"}}>
-            <DialogTitle>Rename Segment</DialogTitle>
+            <DialogTitle>{t("mapActions.edit.renameSegment")}</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    How should the segment &apos;{currentName}&apos; be called?
+                    {t("mapActions.edit.renameSegmentPrompt", {name: currentName})}
                 </DialogContentText>
                 <TextField
                     autoFocus
                     margin="dense"
                     variant="standard"
-                    label="Segment name"
+                    label={t("mapActions.edit.segmentName")}
                     fullWidth
                     value={name}
                     onChange={(e) => {
@@ -97,13 +100,13 @@ const SegmentRenameDialog = (props: SegmentRenameDialogProps) => {
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose}>{t("common.cancel")}</Button>
                 <Button
                     onClick={() => {
                         onRename(name.trim());
                     }}
                 >
-                    Rename
+                    {t("mapActions.edit.rename")}
                 </Button>
             </DialogActions>
         </Dialog>
@@ -120,6 +123,7 @@ interface SegmentMaterialDialogProps {
 
 const SegmentMaterialDialog = (props: SegmentMaterialDialogProps) => {
     const {open, onClose, name, currentMaterial, onSubmit} = props;
+    const {t} = useTranslation();
     const [material, setMaterial] = React.useState<MapSegmentMaterial>(currentMaterial);
 
     const {
@@ -137,10 +141,10 @@ const SegmentMaterialDialog = (props: SegmentMaterialDialogProps) => {
 
     return (
         <Dialog open={open} onClose={onClose} sx={{userSelect: "none"}}>
-            <DialogTitle>Segment Material</DialogTitle>
+            <DialogTitle>{t("mapActions.edit.segmentMaterial")}</DialogTitle>
             <DialogContent>
                 <DialogContentText style={{marginBottom: "1rem"}}>
-                    What material is the floor of segment &apos;{name}&apos; made of?
+                    {t("mapActions.edit.segmentMaterialPrompt", {name: name})}
                 </DialogContentText>
                 {materialPropertiesPending ? (
                     <CircularProgress/>
@@ -155,7 +159,7 @@ const SegmentMaterialDialog = (props: SegmentMaterialDialogProps) => {
                                     key={material}
                                     value={material}
                                     control={<Radio/>}
-                                    label={getMaterialLabel(material)}
+                                    label={getMaterialLabel(material, t)}
                                 />
                             ))}
                         </RadioGroup>
@@ -163,13 +167,13 @@ const SegmentMaterialDialog = (props: SegmentMaterialDialogProps) => {
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose}>{t("common.cancel")}</Button>
                 <Button
                     onClick={() => {
                         onSubmit(material);
                     }}
                 >
-                    Save
+                    {t("common.save")}
                 </Button>
             </DialogActions>
         </Dialog>
@@ -209,6 +213,7 @@ const SegmentActions = (
         onAddCuttingLine,
         onClear
     } = props;
+    const {t} = useTranslation();
 
     const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
     const [materialDialogOpen, setMaterialDialogOpen] = React.useState(false);
@@ -308,7 +313,10 @@ const SegmentActions = (
                         onClick={handleJoinClick}
                     >
                         <JoinIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Join {segmentNames[selectedSegmentIds[0]]} and {selectedSegmentIds.length === 2 ? segmentNames[selectedSegmentIds[1]] : "?"}
+                        {t("mapActions.edit.joinSegments", {
+                            segmentA: segmentNames[selectedSegmentIds[0]],
+                            segmentB: selectedSegmentIds.length === 2 ? segmentNames[selectedSegmentIds[1]] : "?"
+                        })}
                         {joinSegmentsExecuting && (
                             <CircularProgress
                                 color="inherit"
@@ -333,7 +341,7 @@ const SegmentActions = (
                         onClick={handleSplitClick}
                     >
                         <SplitIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Split {segmentNames[selectedSegmentIds[0]]}
+                        {t("mapActions.edit.splitSegment", {name: segmentNames[selectedSegmentIds[0]]})}
                         {splitSegmentExecuting && (
                             <CircularProgress
                                 color="inherit"
@@ -360,7 +368,7 @@ const SegmentActions = (
                         }}
                     >
                         <RenameIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Rename
+                        {t("mapActions.edit.rename")}
                         {renameSegmentExecuting && (
                             <CircularProgress
                                 color="inherit"
@@ -387,7 +395,7 @@ const SegmentActions = (
                         }}
                     >
                         <MaterialIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Material
+                        {t("mapActions.edit.material.label")}
                         {setSegmentMaterialExecuting && (
                             <CircularProgress
                                 color="inherit"
@@ -412,7 +420,7 @@ const SegmentActions = (
                         onClick={onAddCuttingLine}
                     >
                         <AddCuttingLineIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Cutting Line
+                        {t("mapActions.edit.cuttingLine")}
                     </ActionButton>
                 </Grid2>
             }
@@ -430,7 +438,7 @@ const SegmentActions = (
                         onClick={onClear}
                     >
                         <ClearIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Clear
+                        {t("mapActions.clear")}
                     </ActionButton>
                 </Grid2>
             }
@@ -438,7 +446,7 @@ const SegmentActions = (
                 !canEdit &&
                 <Grid2>
                     <Typography variant="caption" color="textSecondary">
-                        Editing segments requires the robot to be docked
+                        {t("mapActions.edit.editingSegmentsRequiresDocked")}
                     </Typography>
                 </Grid2>
             }
@@ -447,7 +455,7 @@ const SegmentActions = (
                 selectedSegmentIds.length === 0 &&
                 <Grid2>
                     <Typography variant="caption" color="textSecondary" style={{fontSize: "1em"}}>
-                        Please select a segment to start editing
+                        {t("mapActions.edit.selectSegmentToEdit")}
                     </Typography>
                 </Grid2>
             }

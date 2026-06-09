@@ -6,17 +6,22 @@ import ReactMarkdown from "react-markdown";
 import gfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import style from "./About.module.css";
-import {AboutText} from "./res/AboutText";
+import {AboutText, AboutTextRu} from "./res/AboutText";
 import Logo from "../assets/icons/valetudo_logo_with_name.svg?react";
 import DetailPageHeaderRow from "../components/DetailPageHeaderRow";
+import {useTranslation} from "react-i18next";
+import i18n from "../i18n";
 
 const About = (): React.ReactElement => {
+    const {t} = useTranslation();
+    const aboutText = i18n.language?.toLowerCase().startsWith("ru") ? AboutTextRu : AboutText;
+
     return (
         <PaperContainer>
             <Grid2 container direction="row">
                 <Box style={{width: "100%"}}>
                     <DetailPageHeaderRow
-                        title="About Valetudo"
+                        title={t("about.title")}
                         icon={<AboutIcon/>}
                     />
 
@@ -42,7 +47,7 @@ const About = (): React.ReactElement => {
                             remarkPlugins={[gfm]}
                             rehypePlugins={[rehypeRaw]}
                         >
-                            {AboutText}
+                            {aboutText}
                         </ReactMarkdown>
                     </div>
                 </Box>

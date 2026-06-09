@@ -17,8 +17,10 @@ import {ButtonListMenuItem} from "./list_menu/ButtonListMenuItem";
 import {
     Layers as MappingPassIcon
 } from "@mui/icons-material";
+import {Trans, useTranslation} from "react-i18next";
 
 const FullCleanupButtonItem = (): React.ReactElement => {
+    const {t} = useTranslation();
     const {
         mutate: executeBasicControlCommand,
         isPending: basicControlIsExecuting
@@ -26,13 +28,13 @@ const FullCleanupButtonItem = (): React.ReactElement => {
 
     return (
         <ButtonListMenuItem
-            primaryLabel="Full Cleanup"
-            secondaryLabel="Create a new map"
+            primaryLabel={t("components.welcome.fullCleanup")}
+            secondaryLabel={t("components.welcome.createNewMap")}
             icon={<MappingPassIcon/>}
-            buttonLabel="Go"
+            buttonLabel={t("robotOptions.go")}
             confirmationDialog={{
-                title: "Start full cleanup?",
-                body: "The robot needs to return to the dock on its own to save the newly created map. Do not interfere with the cleanup or else it won't be saved."
+                title: t("components.welcome.startFullCleanup"),
+                body: t("components.welcome.startFullCleanupDescription")
             }}
             action={() => {
                 executeBasicControlCommand("start");
@@ -46,6 +48,7 @@ const WelcomeDialog: FunctionComponent<{open: boolean, hide: () => void}> = ({
     open,
     hide
 }): React.ReactElement => {
+    const {t} = useTranslation();
     const [
         basicControlSupported,
         persistentMapControlSupported,
@@ -64,7 +67,7 @@ const WelcomeDialog: FunctionComponent<{open: boolean, hide: () => void}> = ({
             open={open}
         >
             <DialogTitle>
-                Welcome to Valetudo
+                {t("components.welcome.title")}
             </DialogTitle>
             <DialogContent>
                 <DialogContentText
@@ -74,26 +77,24 @@ const WelcomeDialog: FunctionComponent<{open: boolean, hide: () => void}> = ({
                     component="span"
                 >
                     <Typography>
-                        It looks like it might be the first time that you&apos;re using Valetudo on this robot.
+                        {t("components.welcome.intro")}
                     </Typography>
                     <br/>
                     <Typography>
-                        The first step is usually to let the robot create a new map of your home.
-                        Depending on your firmware, the map will allow you to clean specific rooms, add virtual walls and more.
+                        {t("components.welcome.firstStep")}
                         <br/><br/>
-                        There are some variations in the map creation process based on the model of robot.
-                        For example, some robots might require you to enable map persistence first, whereas others might offer a dedicated Mapping Pass.
+                        {t("components.welcome.variations")}
                     </Typography>
                     <br/>
                     <Typography component="span">
-                        For the initial mapping, please ensure that:
+                        {t("components.welcome.ensurePrefix")}
                         <ul>
-                            <li>the robot is docked</li>
-                            <li>all relevant doors are open</li>
-                            <li>there are no loose cables lying around</li>
-                            <li>all areas you don&apos;t want it to go are blocked off</li>
+                            <li>{t("components.welcome.ensureDocked")}</li>
+                            <li>{t("components.welcome.ensureDoorsOpen")}</li>
+                            <li>{t("components.welcome.ensureNoCables")}</li>
+                            <li>{t("components.welcome.ensureBlockedOff")}</li>
                         </ul>
-                        With that done, here&apos;s what you&apos;ll need to let your robot create a new map:
+                        {t("components.welcome.ensureSuffix")}
                     </Typography>
                     {
                         persistentMapControlSupported &&
@@ -131,10 +132,15 @@ const WelcomeDialog: FunctionComponent<{open: boolean, hide: () => void}> = ({
                     }
                     <br/>
                     <Typography>
-                        While watching your robot zip around, you might want to <Link href="https://github.com/sponsors/Hypfer" target="_blank" rel="noopener">consider donating</Link>.
-                        If you&apos;d rather decide later, the donation link can also be found hiding unobtrusively at the bottom of the sidebar menu.
+                        <Trans
+                            t={t}
+                            i18nKey="components.welcome.donation"
+                            components={{
+                                donationLink: <Link href="https://github.com/sponsors/Hypfer" target="_blank" rel="noopener"/>
+                            }}
+                        />
                         <br/><br/>
-                        Now, please enjoy your cloud-free robot :)
+                        {t("components.welcome.enjoy")}
                     </Typography>
                 </DialogContentText>
             </DialogContent>
@@ -142,12 +148,12 @@ const WelcomeDialog: FunctionComponent<{open: boolean, hide: () => void}> = ({
                 <Button onClick={() => {
                     hide();
                 }}>
-                    Hide
+                    {t("components.welcome.hide")}
                 </Button>
                 <Button onClick={() => {
                     dismissWelcomeDialog();
                 }}>
-                    Do not show again
+                    {t("components.welcome.doNotShowAgain")}
                 </Button>
             </DialogActions>
         </Dialog>

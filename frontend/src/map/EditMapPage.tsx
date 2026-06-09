@@ -6,10 +6,12 @@ import {
 } from "../api";
 import {useCapabilitiesSupported} from "../CapabilitiesProvider";
 import EditMap, { mode } from "./EditMap";
-import {SegmentEditHelp} from "./res/SegmentEditHelp";
-import {VirtualRestrictionEditHelp} from "./res/VirtualRestrictionEditHelp";
+import {SegmentEditHelp, SegmentEditHelpRu} from "./res/SegmentEditHelp";
+import {VirtualRestrictionEditHelp, VirtualRestrictionEditHelpRu} from "./res/VirtualRestrictionEditHelp";
 import {useSnackbar} from "notistack";
 import React from "react";
+import {useTranslation} from "react-i18next";
+import i18n from "../i18n";
 
 
 const Container = styled(Box)({
@@ -51,24 +53,26 @@ const EditMapPage = (props: {
 
     const theme = useTheme();
     const {enqueueSnackbar} = useSnackbar();
+    const {t} = useTranslation();
 
+    const useRu = i18n.language?.toLowerCase().startsWith("ru");
     let helpText = "";
 
     if (props.mode === "segments") {
-        helpText = SegmentEditHelp;
+        helpText = useRu ? SegmentEditHelpRu : SegmentEditHelp;
     } else if (props.mode === "virtual_restrictions") {
-        helpText = VirtualRestrictionEditHelp;
+        helpText = useRu ? VirtualRestrictionEditHelpRu : VirtualRestrictionEditHelp;
     }
 
     if (mapLoadError) {
         return (
             <Container>
-                <Typography color="error">Error loading map data</Typography>
+                <Typography color="error">{t("map.errorLoadingMapData")}</Typography>
                 <Box m={1}/>
                 <Button color="primary" variant="contained" onClick={() => {
                     return refetchMap();
                 }}>
-                    Retry
+                    {t("map.retry")}
                 </Button>
             </Container>
         );
@@ -85,7 +89,7 @@ const EditMapPage = (props: {
     if (!mapData) {
         return (
             <Container>
-                <Typography align="center">No map data</Typography>;
+                <Typography align="center">{t("map.noMapData")}</Typography>;
             </Container>
         );
     }
@@ -93,7 +97,7 @@ const EditMapPage = (props: {
     if (!robotStatus) {
         return (
             <Container>
-                <Typography align="center">No robot status</Typography>;
+                <Typography align="center">{t("map.noRobotStatus")}</Typography>;
             </Container>
         );
     }

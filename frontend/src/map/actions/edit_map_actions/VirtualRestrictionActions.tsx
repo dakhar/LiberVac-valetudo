@@ -7,6 +7,7 @@ import {
     ValetudoRestrictedZoneType
 } from "../../../api";
 import React from "react";
+import {useTranslation} from "react-i18next";
 import {Box, Button, CircularProgress, Container, Grid2, Typography} from "@mui/material";
 import {ActionButton} from "../../Styled";
 import VirtualWallClientStructure from "../../structures/client_structures/VirtualWallClientStructure";
@@ -60,6 +61,7 @@ const VirtualRestrictionActions = (
         onRefresh,
         onClear
     } = props;
+    const {t} = useTranslation();
 
 
     const {
@@ -136,14 +138,14 @@ const VirtualRestrictionActions = (
         return (
             <Container>
                 <Typography color="error">
-                    Error loading {Capability.CombinedVirtualRestrictions} properties
+                    {t("mapActions.errorLoadingProperties", {capability: Capability.CombinedVirtualRestrictions})}
                 </Typography>
                 <Box m={1}/>
                 <Button color="primary" variant="contained" onClick={() => {
                     return refetchCombinedVirtualRestrictionsProperties();
                 }}>
                     <RefreshIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                    Retry
+                    {t("mapActions.retry")}
                 </Button>
             </Container>
         );
@@ -161,7 +163,7 @@ const VirtualRestrictionActions = (
         return (
             <Container>
                 <Typography align="center">
-                    No {Capability.CombinedVirtualRestrictions} properties
+                    {t("mapActions.noProperties", {capability: Capability.CombinedVirtualRestrictions})}
                 </Typography>
             </Container>
         );
@@ -182,7 +184,7 @@ const VirtualRestrictionActions = (
                         onClick={handleSaveClick}
                     >
                         <SaveIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Save
+                        {t("common.save")}
                         {restrictionsSaving && (
                             <CircularProgress
                                 color="inherit"
@@ -204,7 +206,7 @@ const VirtualRestrictionActions = (
                         onClick={onAddVirtualWall}
                     >
                         <AddVirtualWallIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Wall ({virtualWalls.length})
+                        {t("mapActions.edit.wall", {n: virtualWalls.length})}
                     </ActionButton>
                 </Grid2>
             }
@@ -220,7 +222,7 @@ const VirtualRestrictionActions = (
                         onClick={onAddNoGoArea}
                     >
                         <AddNoGoAreaIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        No-Go ({noGoAreas.length})
+                        {t("mapActions.edit.noGo", {n: noGoAreas.length})}
                     </ActionButton>
                 </Grid2>
             }
@@ -236,7 +238,7 @@ const VirtualRestrictionActions = (
                         onClick={onAddNoMopArea}
                     >
                         <AddNoMopAreaIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        No-Mop ({noMopAreas.length})
+                        {t("mapActions.edit.noMop", {n: noMopAreas.length})}
                     </ActionButton>
                 </Grid2>
             }
@@ -252,7 +254,7 @@ const VirtualRestrictionActions = (
                         onClick={onClear}
                     >
                         <ClearIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Clear
+                        {t("mapActions.clear")}
                     </ActionButton>
                 </Grid2>
             }
@@ -267,7 +269,7 @@ const VirtualRestrictionActions = (
                         onClick={onRefresh}
                     >
                         <RefreshIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        Refresh
+                        {t("mapActions.edit.refresh")}
                     </ActionButton>
                 </Grid2>
             }
@@ -275,7 +277,7 @@ const VirtualRestrictionActions = (
                 !canEdit &&
                 <Grid2>
                     <Typography variant="caption" color="textSecondary">
-                        Editing virtual restrictions requires the robot to be docked
+                        {t("mapActions.edit.editingRestrictionsRequiresDocked")}
                     </Typography>
                 </Grid2>
             }

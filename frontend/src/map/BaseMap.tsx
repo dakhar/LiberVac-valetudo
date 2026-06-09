@@ -19,6 +19,7 @@ import {PinchEndTouchHandlerEvent} from "./utils/touch_handling/events/PinchEndT
 import {PointCoordinates} from "./utils/types";
 import { create } from "zustand";
 import {clampMapScalingFactorFactor, considerHiDPI} from "./utils/helpers";
+import i18n from "../i18n";
 
 export interface MapProps {
     rawMap: RawMapData;
@@ -693,8 +694,8 @@ abstract class BaseMap<P, S> extends React.Component<P & MapProps, S & MapState 
         ctx.textAlign = "left";
         ctx.textBaseline = "alphabetic";
 
-        const line1Text = "Activate Valetudo";
-        const line2Text = "Go to Settings to activate Valetudo.";
+        const line1Text = i18n.t("map.activateValetudo");
+        const line2Text = i18n.t("map.activateValetudoDescription");
 
         const line1FontSize = 24;
         const line2FontSize = 14;

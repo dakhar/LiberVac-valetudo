@@ -32,6 +32,7 @@ import {useLocalStorage} from "../hooks";
 import {XmPlayer} from "../util/XmPlayer";
 import {useValetudoColorsInverse} from "../hooks/useValetudoColors";
 import {lightPalette} from "../colors";
+import {useTranslation} from "react-i18next";
 
 import keygenMusicUrl from "../assets/raw/keygen.xm.gz";
 import robotJsonUrl from "../assets/raw/robot.json.gz";
@@ -70,6 +71,7 @@ const fetchAndDecompress = async (url: string): Promise<ArrayBuffer> => {
 };
 
 const KeygenOverlay = ({ onComplete, isReplay, assets }: { onComplete: () => void, isReplay: boolean, assets: Assets }) => {
+    const {t} = useTranslation();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const playerRef = useRef<XmPlayer | null>(null);
     const [musicEnabled, setMusicEnabled] = useState(true);
@@ -158,14 +160,14 @@ const KeygenOverlay = ({ onComplete, isReplay, assets }: { onComplete: () => voi
         }));
 
         let scrollX = width;
-        let currentKey = "INITIALIZING...";
+        let currentKey = t("valetudoActivation.keygenInitializing");
         let lastKeyUpdate = 0;
         let progress = isReplay ? 100 : 0;
 
         let lastTime = performance.now();
         const startTime = lastTime;
 
-        const scrollText = " *** PROUDLY PRESENTING >> VALETUDO << ON APRIL FIRST! +++ MORE THAN SEVEN YEARS OF CLOUD FREE VACUUM ROBOTS +++ GREETINGS TO YOU AND OTHER PEOPLE I GUESS +++ I REALLY DO NOT KNOW WHAT TO PUT HERE ... I AM JUST COPYING THIS AESTHETIC WITHOUT HAVING DEEPER TIES TO OR UNDERSTANDING OF IT!!! THIS IS ESSENTIALLY JUST POSING +++ SONG: REZ - UNREEEAL SUPERHERO 2 (CC-BY-NC-SA, APPARENTLY) ***";
+        const scrollText = t("valetudoActivation.keygenScrollText");
         const randomBlock = () => Math.random().toString(36).substring(2, 7).toUpperCase();
 
         const draw = () => {
@@ -337,7 +339,7 @@ const KeygenOverlay = ({ onComplete, isReplay, assets }: { onComplete: () => voi
 
                 if (Math.floor(time / 0.33) % 2 === 0) {
                     ctx.fillStyle = "#0F0";
-                    ctx.fillText(">>> LICENSE PATCHED <<<", cx, keySectionY);
+                    ctx.fillText(t("valetudoActivation.keygenLicensePatched"), cx, keySectionY);
                 }
             }
 
@@ -350,7 +352,7 @@ const KeygenOverlay = ({ onComplete, isReplay, assets }: { onComplete: () => voi
             window.removeEventListener("resize", resize);
             cancelAnimationFrame(animId);
         };
-    }, [isReplay, assets.mesh, valetudoColors]);
+    }, [isReplay, assets.mesh, valetudoColors, t]);
 
     return (
         <div style={{
@@ -379,7 +381,7 @@ const KeygenOverlay = ({ onComplete, isReplay, assets }: { onComplete: () => voi
                         "&:hover": { bgcolor: alpha(valetudoColors.purple, 0.8) }
                     }}
                 >
-                    MUTE
+                    {t("valetudoActivation.mute")}
                 </Button>
 
                 {cracked && (
@@ -393,7 +395,7 @@ const KeygenOverlay = ({ onComplete, isReplay, assets }: { onComplete: () => voi
                             "&:hover": { background: alpha(valetudoColors.green, 0.8) }
                         }}
                     >
-                        EXIT
+                        {t("valetudoActivation.exit")}
                     </Button>
                 )}
             </div>
@@ -402,6 +404,7 @@ const KeygenOverlay = ({ onComplete, isReplay, assets }: { onComplete: () => voi
 };
 
 export const ActivationListMenuItem = (): React.ReactElement => {
+    const {t} = useTranslation();
     const [isActivated, setIsActivated] = useLocalStorage<boolean>("aprilfools-valetudo-activation", false);
 
     const [open, setOpen] = useState(false);
@@ -533,17 +536,17 @@ export const ActivationListMenuItem = (): React.ReactElement => {
     return (
         <>
             <ButtonListMenuItem
-                primaryLabel="Valetudo Activation"
-                secondaryLabel={isActivated ? "Activated with a digital license" : "Valetudo is not activated"}
+                primaryLabel={t("valetudoActivation.title")}
+                secondaryLabel={isActivated ? t("valetudoActivation.activatedWithDigitalLicense") : t("valetudoActivation.notActivated")}
                 icon={isActivated ? <VerifiedIcon sx={{color: valetudoColors.green}}/> : <UnverifiedIcon/>}
-                buttonLabel={isActivated ? "Details" : "Activate"}
+                buttonLabel={isActivated ? t("valetudoActivation.details") : t("valetudoActivation.activate")}
                 action={() => setOpen(true)}
                 actionLoading={false}
             />
 
             <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
                 <DialogTitle>
-                    {isActivated ? "Valetudo Genuine Advantage" : "Activation Required"}
+                    {isActivated ? t("valetudoActivation.genuineAdvantage") : t("valetudoActivation.activationRequired")}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{display: "flex", flexDirection: "column", gap: 2, mt: 1}}>
@@ -551,10 +554,10 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                             <>
                                 <Box sx={{ display: "flex", alignItems: "center", gap: 1}}>
                                     <VerifiedIcon sx={{color: valetudoColors.green}} fontSize="large" />
-                                    <Typography variant="h6">Licensed Product</Typography>
+                                    <Typography variant="h6">{t("valetudoActivation.licensedProduct")}</Typography>
                                 </Box>
                                 <DialogContentText>
-                                    Valetudo is activated with a digital license.
+                                    {t("valetudoActivation.activatedWithDigitalLicenseLong")}
                                 </DialogContentText>
 
                                 <Box sx={{
@@ -567,15 +570,15 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                                     boxShadow: 2
                                 }}>
                                     <Box sx={{mb: 1}}>
-                                        <Typography variant="caption" sx={{color: theme.palette.text.secondary, display: "block"}}>LICENSE TYPE</Typography>
+                                        <Typography variant="caption" sx={{color: theme.palette.text.secondary, display: "block"}}>{t("valetudoActivation.licenseType")}</Typography>
                                         <Typography variant="body2" sx={{color: valetudoColors.lightBlue, fontWeight: "bold"}}>
-                                            Unlimited Company License
+                                            {t("valetudoActivation.unlimitedCompanyLicense")}
                                         </Typography>
                                     </Box>
                                     <Divider sx={{ mb: 1}} />
 
                                     <Box sx={{mb: 1}}>
-                                        <Typography variant="caption" sx={{color: theme.palette.text.secondary, display: "block"}}>REGISTERED TO</Typography>
+                                        <Typography variant="caption" sx={{color: theme.palette.text.secondary, display: "block"}}>{t("valetudoActivation.registeredTo")}</Typography>
                                         <Typography variant="body2" sx={{color: valetudoColors.lightBlue}}>
                                             Hackerman
                                         </Typography>
@@ -586,10 +589,10 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                             <>
                                 <Box>
                                     <DialogContentText sx={{ color: "text.primary", fontWeight: 500 }}>
-                                        Your Evaluation License for Valetudo has expired.
+                                        {t("valetudoActivation.evaluationLicenseExpired")}
                                     </DialogContentText>
                                     <DialogContentText sx={{ fontSize: "0.9rem", mt: 1 }}>
-                                        Continued use of this software requires a valid <strong>Valetudo</strong> subscription.
+                                        {t("valetudoActivation.subscriptionRequiredBefore")}<strong>Valetudo</strong>{t("valetudoActivation.subscriptionRequiredAfter")}
                                     </DialogContentText>
                                 </Box>
 
@@ -603,11 +606,11 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                                     boxShadow: 2
                                 }}>
                                     <Typography variant="subtitle2" gutterBottom sx={{color: cloudStatus === "failed" ? theme.palette.error.main : valetudoColors.lightBlue, fontWeight: "bold", fontFamily: "monospace"}}>
-                                        {">"} Cloud Activation
+                                        {">"} {t("valetudoActivation.cloudActivation")}
                                     </Typography>
                                     <Typography variant="caption" display="block" sx={{mb: 2, color: theme.palette.text.secondary, fontFamily: "monospace"}}>
-                                        Automatically fetch a license from the Valetudo Licensing Server.<br/>
-                                        Requires an active internet connection.
+                                        {t("valetudoActivation.cloudActivationDescription1")}<br/>
+                                        {t("valetudoActivation.cloudActivationDescription2")}
                                     </Typography>
 
                                     {cloudStatus === "idle" && (
@@ -617,14 +620,14 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                                             startIcon={<CloudSync />}
                                             onClick={handleCloudSync}
                                         >
-                                            Activate Valetudo now
+                                            {t("valetudoActivation.activateNow")}
                                         </Button>
                                     )}
                                     {cloudStatus === "connecting" && (
                                         <Box sx={{ width: "100%" }}>
                                             <LinearProgress />
                                             <Typography variant="caption" align="center" display="block" sx={{mt: 1, color: theme.palette.text.secondary, fontFamily: "monospace"}}>
-                                                Handshaking with licensing.valetudo.cloud...
+                                                {t("valetudoActivation.handshaking", {host: "licensing.valetudo.cloud"})}
                                             </Typography>
                                         </Box>
                                     )}
@@ -632,10 +635,10 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                                         <Box sx={{ textAlign: "center" }}>
                                             <CloudOff color="error" fontSize="large" />
                                             <Typography color="error" variant="body2" fontWeight="bold" sx={{fontFamily: "monospace", mt: 1}}>
-                                                CONNECTION TIMED OUT (Error 000)
+                                                {t("valetudoActivation.connectionTimedOut")}
                                             </Typography>
                                             <Typography variant="caption" display="block" sx={{color: theme.palette.text.secondary, fontFamily: "monospace", mb: 2}}>
-                                                The licensing server is unreachable.
+                                                {t("valetudoActivation.licensingServerUnreachable")}
                                             </Typography>
                                             <Button
                                                 variant="outlined"
@@ -651,19 +654,19 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                                                     textTransform: "none"
                                                 }}
                                             >
-                                                Activate by Phone
+                                                {t("valetudoActivation.activateByPhone")}
                                             </Button>
                                         </Box>
                                     )}
                                 </Box>
 
                                 <Typography variant="caption" align="center" sx={{ display: "block", my: 1, color: theme.palette.text.secondary }}>
-                                    — OR —
+                                    {t("valetudoActivation.or")}
                                 </Typography>
 
                                 <TextField
                                     id="license-key"
-                                    label="Enter License Key"
+                                    label={t("valetudoActivation.enterLicenseKey")}
                                     type="text"
                                     fullWidth
                                     size="small"
@@ -675,7 +678,7 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                                         setError(false);
                                     }}
                                     error={error}
-                                    helperText={error ? "Error: Invalid checksum or revoked key." : "If you have a license key, enter it here."}
+                                    helperText={error ? t("valetudoActivation.invalidChecksum") : t("valetudoActivation.enterLicenseKeyHint")}
                                     InputProps={{
                                         style: {fontFamily: "monospace"},
                                         endAdornment: <VpnKey color="action" />
@@ -688,7 +691,7 @@ export const ActivationListMenuItem = (): React.ReactElement => {
 
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={handleClose} color="inherit">
-                        {isActivated ? "Close" : "Cancel"}
+                        {isActivated ? t("common.close") : t("common.cancel")}
                     </Button>
 
                     {!isActivated ? (
@@ -697,7 +700,7 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                             disabled={keyInput.length < 5}
                             startIcon={<Business />}
                         >
-                            Activate
+                            {t("valetudoActivation.activate")}
                         </Button>
                     ) : (
                         <Button
@@ -707,7 +710,7 @@ export const ActivationListMenuItem = (): React.ReactElement => {
                             loading={loadingAssets}
                             loadingPosition="start"
                         >
-                            View Keygen again
+                            {t("valetudoActivation.viewKeygenAgain")}
                         </Button>
                     )}
                 </DialogActions>

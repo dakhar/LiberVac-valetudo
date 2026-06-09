@@ -20,9 +20,11 @@ import {SpacerListMenuItem} from "../components/list_menu/SpacerListMenuItem";
 import { TextEditModalListMenuItem } from "../components/list_menu/TextEditModalListMenuItem";
 import { ActivationListMenuItem } from "./ValetudoActivation";
 import {isAprilFools} from "../utils";
+import {useTranslation} from "react-i18next";
 
 
 const ConfigRestoreButtonListMenuItem = (): React.ReactElement => {
+    const {t} = useTranslation();
     const {
         mutate: restoreDefaultConfiguration,
         isPending: restoreDefaultConfigurationIsExecuting
@@ -30,14 +32,14 @@ const ConfigRestoreButtonListMenuItem = (): React.ReactElement => {
 
     return (
         <ButtonListMenuItem
-            primaryLabel="Restore Default Configuration"
-            secondaryLabel="This will only affect Valetudo"
+            primaryLabel={t("valetudoOptions.restoreDefaultConfiguration")}
+            secondaryLabel={t("valetudoOptions.restoreDefaultConfigurationDescription")}
             icon={<ConfigRestoreIcon/>}
-            buttonLabel="Go"
+            buttonLabel={t("valetudoOptions.go")}
             buttonColor={"error"}
             confirmationDialog={{
-                title: "Restore default Valetudo configuration?",
-                body: "Are you sure that you want to restore the default configuration? This will not affect Wi-Fi settings, Map data etc."
+                title: t("valetudoOptions.restoreDefaultConfigurationConfirmTitle"),
+                body: t("valetudoOptions.restoreDefaultConfigurationConfirmBody")
             }}
             action={() => {
                 restoreDefaultConfiguration();
@@ -48,6 +50,7 @@ const ConfigRestoreButtonListMenuItem = (): React.ReactElement => {
 };
 
 const FriendlyNameEditModalListMenuItem = (): React.ReactElement => {
+    const {t} = useTranslation();
     const {
         data: valetudoCustomizations,
         isPending: valetudoCustomizationsPending,
@@ -57,7 +60,7 @@ const FriendlyNameEditModalListMenuItem = (): React.ReactElement => {
         isPending: valetudoCustomizationsUpdating
     } = useValetudoCustomizationsMutation();
 
-    const description = "Set a custom friendly name for Network Advertisement, MQTT etc.";
+    const description = t("valetudoOptions.customFriendlyNameDescription");
     let secondaryLabel = description;
 
     if (valetudoCustomizations && valetudoCustomizations.friendlyName !== "") {
@@ -70,7 +73,7 @@ const FriendlyNameEditModalListMenuItem = (): React.ReactElement => {
             value={valetudoCustomizations?.friendlyName ?? ""}
 
             dialog={{
-                title: "Custom Friendly Name",
+                title: t("valetudoOptions.customFriendlyName"),
                 description: description,
 
                 validatingTransformer: (newValue: string) => {
@@ -84,24 +87,25 @@ const FriendlyNameEditModalListMenuItem = (): React.ReactElement => {
             }}
 
             icon={<FriendlyNameIcon/>}
-            primaryLabel={"Custom Friendly Name"}
+            primaryLabel={t("valetudoOptions.customFriendlyName")}
             secondaryLabel={secondaryLabel}
         />
     );
 };
 
-const updateProviders : Array<SelectListMenuItemOption> = [
-    {
-        value: "github",
-        label: "Release"
-    },
-    {
-        value: "github_nightly",
-        label: "Nightly"
-    }
-];
-
 const UpdateProviderSelectListMenuItem = (): React.ReactElement => {
+    const {t} = useTranslation();
+    const updateProviders : Array<SelectListMenuItemOption> = React.useMemo(() => [
+        {
+            value: "github",
+            label: t("valetudoOptions.updateChannelRelease")
+        },
+        {
+            value: "github_nightly",
+            label: t("valetudoOptions.updateChannelNightly")
+        }
+    ], [t]);
+
     const {
         data: storedConfiguration,
         isPending: configurationPending,
@@ -126,14 +130,15 @@ const UpdateProviderSelectListMenuItem = (): React.ReactElement => {
             disabled={disabled}
             loadingOptions={false}
             loadError={configurationError}
-            primaryLabel="Update Channel"
-            secondaryLabel="Select the channel used by the inbuilt updater"
+            primaryLabel={t("valetudoOptions.updateChannel")}
+            secondaryLabel={t("valetudoOptions.updateChannelDescription")}
             icon={<UpdaterIcon/>}
         />
     );
 };
 
 const ValetudoOptions = (): React.ReactElement => {
+    const {t} = useTranslation();
     const listItems = React.useMemo(() => {
         const items = [
             <ConfigRestoreButtonListMenuItem key={"configRestoreAction"}/>,
@@ -155,8 +160,8 @@ const ValetudoOptions = (): React.ReactElement => {
     return (
         <PaperContainer>
             <ListMenu
-                primaryHeader={"Valetudo Options"}
-                secondaryHeader={"Tunables and actions provided by Valetudo"}
+                primaryHeader={t("valetudoOptions.title")}
+                secondaryHeader={t("valetudoOptions.subtitle")}
                 listItems={listItems}
             />
         </PaperContainer>

@@ -6,6 +6,7 @@ import {PointCoordinates} from "../../utils/types";
 import {StructureInterceptionHandlerResult} from "../Structure";
 import ObstacleImage from "../../../components/ObstacleImage";
 import {Typography} from "@mui/material";
+import i18n from "../../../i18n";
 
 const img = new Image();
 img.src = obstacleIconSVG;
@@ -78,7 +79,7 @@ class ObstacleMapStructure extends MapStructure {
             return {
                 stopPropagation: true,
                 openDialog: {
-                    title: "Obstacle Information",
+                    title: i18n.t("mapActions.obstacleInformation"),
                     body: (
                         <>
                             {

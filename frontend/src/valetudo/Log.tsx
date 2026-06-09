@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import {Refresh as RefreshIcon, FilterAlt as FilterAltIcon} from "@mui/icons-material";
 import React from "react";
+import {useTranslation} from "react-i18next";
 import styles from "./Log.module.css";
 import {LogLevel, LogLine, useLogLevelMutation, useLogLevelQuery, useValetudoLogQuery} from "../api";
 import LogViewer from "../components/LogViewer";
@@ -68,6 +69,7 @@ const StyledInputBase = styled(InputBase)(({theme}) => {
 
 
 const Log = (): React.ReactElement => {
+    const {t} = useTranslation();
     const [filter, setFilter] = React.useState("");
 
     const {
@@ -87,7 +89,7 @@ const Log = (): React.ReactElement => {
 
     const logLines = React.useMemo(() => {
         if (logError || logLevelError) {
-            return <Typography color="error">Error loading log</Typography>;
+            return <Typography color="error">{t("log.errorLoading")}</Typography>;
         }
 
         const processedLog : Array<LogLine> = [];
@@ -142,7 +144,7 @@ const Log = (): React.ReactElement => {
                                 <FilterAltIcon/>
                             </SearchIconWrapper>
                             <StyledInputBase
-                                placeholder="Filter…"
+                                placeholder={t("log.filter")}
                                 inputProps={{
                                     "aria-label": "filter",
                                     value: filter,
@@ -155,11 +157,11 @@ const Log = (): React.ReactElement => {
                     </Grid2>
                     <Grid2 size={{xs: 3, sm:2}}>
                         <FormControl fullWidth>
-                            <InputLabel id="log-level-selector">Current Level</InputLabel>
+                            <InputLabel id="log-level-selector">{t("log.currentLevel")}</InputLabel>
                             <Select
                                 labelId="log-level-selector"
                                 value={logLevel?.current || "info"}
-                                label="Current Level"
+                                label={t("log.currentLevel")}
                                 onChange={(e) => {
                                     mutateLogLevel({
                                         level: e.target.value as LogLevel
@@ -185,7 +187,7 @@ const Log = (): React.ReactElement => {
                                     console.error(err);
                                 });
                             }}
-                            title="Refresh"
+                            title={t("log.refresh")}
                         >
                             <RefreshIcon/>
                         </Button>
@@ -206,7 +208,7 @@ const Log = (): React.ReactElement => {
                 </Grid2>
             </Grid2>
         );
-    }, [logData, logDataFetching, logError, logRefetch, logLevel, logLevelError, logLevelRefetch, mutateLogLevel, filter, setFilter]);
+    }, [logData, logDataFetching, logError, logRefetch, logLevel, logLevelError, logLevelRefetch, mutateLogLevel, filter, setFilter, t]);
 
     return (
         <PaperContainer>

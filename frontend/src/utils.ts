@@ -1,6 +1,8 @@
 //Adapted from https://stackoverflow.com/a/34270811/10951033
 import {ConsumableSubType, ConsumableType, ValetudoDataPoint} from "./api";
 import {useCallback, useLayoutEffect, useRef} from "react";
+import type {TFunction} from "i18next";
+import i18n from "./i18n";
 
 export function convertSecondsToHumans(seconds: number, showSeconds = true, showDays = true): string {
     let levels;
@@ -9,15 +11,15 @@ export function convertSecondsToHumans(seconds: number, showSeconds = true, show
         levels = [
             {
                 value: Math.floor(seconds / 86400),
-                label: "d"
+                label: i18n.t("units.days", {defaultValue: "d"})
             },
             {
                 value: Math.floor((seconds % 86400) / 3600).toString().padStart(2, "0"),
-                label: "h"
+                label: i18n.t("units.hours", {defaultValue: "h"})
             },
             {
                 value: Math.floor(((seconds % 86400) % 3600) / 60).toString().padStart(2, "0"),
-                label: "m"
+                label: i18n.t("units.minutes", {defaultValue: "m"})
             }
         ];
 
@@ -26,7 +28,7 @@ export function convertSecondsToHumans(seconds: number, showSeconds = true, show
             levels.push(
                 {
                     value: (((seconds % 86400) % 3600) % 60).toString().padStart(2, "0"),
-                    label: "s"
+                    label: i18n.t("units.seconds", {defaultValue: "s"})
                 }
             );
         }
@@ -34,11 +36,11 @@ export function convertSecondsToHumans(seconds: number, showSeconds = true, show
         levels = [
             {
                 value: Math.floor(seconds / 3600).toString().padStart(2, "0"),
-                label: "h"
+                label: i18n.t("units.hours", {defaultValue: "h"})
             },
             {
                 value: Math.floor((seconds % 3600) / 60).toString().padStart(2, "0"),
-                label: "m"
+                label: i18n.t("units.minutes", {defaultValue: "m"})
             }
         ];
 
@@ -47,7 +49,7 @@ export function convertSecondsToHumans(seconds: number, showSeconds = true, show
             levels.push(
                 {
                     value: ((seconds % 3600) % 60).toString().padStart(2, "0"),
-                    label: "s"
+                    label: i18n.t("units.seconds", {defaultValue: "s"})
                 }
             );
         }
@@ -99,6 +101,20 @@ export function convertNumberToRoman(num: number): string {
     return str;
 }
 
+// Adapted from https://stackoverflow.com/a/53660837
+export const median = (numbers: Array<number>): number => { //Note that this will modify the input array
+    const sorted = numbers.sort((a, b) => {
+        return a - b;
+    });
+    const middle = Math.floor(sorted.length / 2);
+
+    if (sorted.length % 2 === 0) {
+        return (sorted[middle - 1] + sorted[middle]) / 2;
+    }
+
+    return sorted[middle];
+};
+
 // Adapted from https://gist.github.com/erikvullings/ada7af09925082cbb89f40ed962d475e
 export const deepCopy = <T>(target: T): T => {
     if (target === null) {
@@ -126,73 +142,67 @@ export const deepCopy = <T>(target: T): T => {
     return target;
 };
 
-const consumableTypeMapping: Record<ConsumableType, string> = {
-    "brush": "Brush",
-    "filter": "Filter",
-    "cleaning": "Cleaning",
-    "mop": "Mop",
-    "detergent": "Detergent",
-    "bin": "Bin"
+export const getConsumableName = (
+    type: ConsumableType,
+    subType: ConsumableSubType | undefined,
+    t: TFunction
+): string => {
+    const typeName = t(`consumables.type.${type}`, {defaultValue: type});
+    const subTypeName = subType ? t(`consumables.subType.${subType}`, {defaultValue: ""}) : "";
+    const parts = [subTypeName, typeName].filter(Boolean);
+    return parts.join(" ") || t("consumables.unknownConsumable", {type: type, subType: subType});
 };
 
-const consumableSubtypeMapping: Record<ConsumableSubType, string> = {
-    "main": "Main",
-    "secondary": "Secondary",
-    "side_right": "Right",
-    "side_left": "Left",
-    "all": "",
-    "none": "",
-    "dock": "Dock",
-    "sensor": "Sensor",
-    "wheel": "Wheel",
-};
-
-export const getConsumableName = (type: ConsumableType, subType?: ConsumableSubType): string => {
-    let ret = "";
-    if (subType && subType in consumableSubtypeMapping) {
-        ret += consumableSubtypeMapping[subType] + " ";
-    }
-    if (type in consumableTypeMapping) {
-        ret += consumableTypeMapping[type];
-    }
-    return ret.trim() || "Unknown consumable: " + type + ", " + subType;
-};
-
-// Adapted from https://stackoverflow.com/a/53660837
-export const median = (numbers: Array<number>): number => { //Note that this will modify the input array
-    numbers.sort((a, b) => {
-        return a - b;
-    });
-
-    const middle = Math.floor(numbers.length / 2);
-
-    if (numbers.length % 2 === 0) {
-        return (numbers[middle - 1] + numbers[middle]) / 2;
-    }
-
-    return numbers[middle];
-};
-
-export function getFriendlyStatName(stat: ValetudoDataPoint) : string {
-    switch (stat.type) {
-        case "area":
-            return "Area";
-        case "time":
-            return "Time";
-        case "count":
-            return "Count";
-    }
+export function getFriendlyStatName(stat: ValetudoDataPoint, t: TFunction): string {
+    return t(`currentStatistics.statType.${stat.type}`, {defaultValue: stat.type});
 }
 
 export function getHumanReadableStatValue(stat: ValetudoDataPoint): string {
     switch (stat.type) {
         case "area":
-            return (stat.value / 10000).toFixed(2).padStart(6, "0") + " m²";
+            return (stat.value / 10000).toFixed(2).padStart(6, "0") + " " + i18n.t("units.squareMeters", {defaultValue: "m²"});
         case "time":
             return convertSecondsToHumans(stat.value, true, false);
         case "count":
             return stat.value.toString();
     }
+}
+
+export function formatRelative(timestamp: number | string | Date, t: TFunction): string {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 0) {
+        return t("relative.inTheFuture");
+    }
+
+    if (diffInSeconds < 60) {
+        return t("relative.justNow");
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+        return t("relative.minutesAgo", {count: diffInMinutes});
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+        return t("relative.hoursAgo", {count: diffInHours});
+    }
+
+    return format8601Ish(date);
+}
+
+export function format8601Ish(date: Date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 //adapted from https://stackoverflow.com/a/60880664
@@ -239,43 +249,6 @@ export const useGetter = <S>(value: S): (() => S) => {
 
 export function extractHostFromUrl(value: string): string {
     return value.replace(/^[a-zA-Z]+:\/\//, "").replace(/\/.*/g, "").trim();
-}
-
-export function formatRelative(timestamp: number | string | Date): string {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 0) {
-        return "In the future";
-    }
-
-    if (diffInSeconds < 60) {
-        return "Just now";
-    }
-
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) {
-        return `${diffInMinutes} minute${diffInMinutes !== 1 ? "s" : ""} ago`;
-    }
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) {
-        return `${diffInHours} hour${diffInHours !== 1 ? "s" : ""} ago`;
-    }
-
-    return format8601Ish(date);
-}
-
-export function format8601Ish(date: Date) {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
-    const seconds = date.getSeconds().toString().padStart(2, "0");
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 }
 
 export let isAprilFools = ((d) => d.getMonth() === 3 && d.getDate() === 1)(new Date());

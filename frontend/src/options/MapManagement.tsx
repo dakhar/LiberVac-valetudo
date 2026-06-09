@@ -23,24 +23,27 @@ import { ButtonListMenuItem } from "../components/list_menu/ButtonListMenuItem";
 import {SpacerListMenuItem} from "../components/list_menu/SpacerListMenuItem";
 import {ListMenu} from "../components/list_menu/ListMenu";
 import {ToggleSwitchListMenuItem} from "../components/list_menu/ToggleSwitchListMenuItem";
-import {MapManagementHelp} from "./res/MapManagementHelp";
+import {MapManagementHelp, MapManagementHelpRu} from "./res/MapManagementHelp";
 import PaperContainer from "../components/PaperContainer";
-import {MapUtilitiesHelp} from "./res/MapUtilitiesHelp";
+import {MapUtilitiesHelp, MapUtilitiesHelpRu} from "./res/MapUtilitiesHelp";
 import {VirtualRestrictionsIcon} from "../components/CustomIcons";
+import {useTranslation} from "react-i18next";
+import i18n from "../i18n";
 
 
 export const MappingPassButtonItem = (): React.ReactElement => {
+    const {t} = useTranslation();
     const {mutate: startMappingPass, isPending: mappingPassStarting} = useStartMappingPassMutation();
 
     return (
         <ButtonListMenuItem
-            primaryLabel="Mapping Pass"
-            secondaryLabel="Create a new map"
+            primaryLabel={t("mapManagement.mappingPass")}
+            secondaryLabel={t("mapManagement.mappingPassDescription")}
             icon={<MappingPassIcon/>}
-            buttonLabel="Go"
+            buttonLabel={t("mapManagement.go")}
             confirmationDialog={{
-                title: "Start mapping pass?",
-                body: "Do you really want to start a mapping pass?"
+                title: t("mapManagement.mappingPassConfirmTitle"),
+                body: t("mapManagement.mappingPassConfirmBody")
             }}
             action={startMappingPass}
             actionLoading={mappingPassStarting}
@@ -49,18 +52,19 @@ export const MappingPassButtonItem = (): React.ReactElement => {
 };
 
 const MapResetButtonItem = (): React.ReactElement => {
+    const {t} = useTranslation();
     const {mutate: resetMap, isPending: mapResetting} = useMapResetMutation();
 
     return (
         <ButtonListMenuItem
-            primaryLabel="Map Reset"
-            secondaryLabel="Delete the current map"
+            primaryLabel={t("mapManagement.mapReset")}
+            secondaryLabel={t("mapManagement.mapResetDescription")}
             icon={<MapResetIcon/>}
-            buttonLabel="Go"
+            buttonLabel={t("mapManagement.go")}
             buttonColor={"error"}
             confirmationDialog={{
-                title: "Reset map?",
-                body: "Do you really want to reset the map?"
+                title: t("mapManagement.mapResetConfirmTitle"),
+                body: t("mapManagement.mapResetConfirmBody")
             }}
             action={resetMap}
             actionLoading={mapResetting}
@@ -69,6 +73,7 @@ const MapResetButtonItem = (): React.ReactElement => {
 };
 
 export const PersistentMapSwitchListItem = () => {
+    const {t} = useTranslation();
     const [dialogOpen, setDialogOpen] = React.useState(false);
     const {
         data: persistentData,
@@ -94,16 +99,16 @@ export const PersistentMapSwitchListItem = () => {
                 }}
                 disabled={disabled}
                 loadError={persistentDataError}
-                primaryLabel={"Persistent maps"}
-                secondaryLabel={"Store a persistent map"}
+                primaryLabel={t("mapManagement.persistentMaps")}
+                secondaryLabel={t("mapManagement.persistentMapsDescription")}
                 icon={<PersistentMapControlIcon/>}
             />
             <ConfirmationDialog
-                title="Disable persistent maps?"
+                title={t("mapManagement.disablePersistentMapsConfirmTitle")}
                 text={(
                     <>
-                        Do you really want to disable persistent maps?<br/>
-                        This will delete the currently stored map.
+                        {t("mapManagement.disablePersistentMapsConfirmBody1")}<br/>
+                        {t("mapManagement.disablePersistentMapsConfirmBody2")}
                     </>
                 )}
                 open={dialogOpen}
@@ -119,6 +124,7 @@ export const PersistentMapSwitchListItem = () => {
 };
 
 const ValetudoMapDataExportButtonItem = (): React.ReactElement => {
+    const {t} = useTranslation();
     const {
         data: valetudoInformation,
         isPending: valetudoInformationPending
@@ -132,10 +138,10 @@ const ValetudoMapDataExportButtonItem = (): React.ReactElement => {
 
     return (
         <ButtonListMenuItem
-            primaryLabel="Export ValetudoMap"
-            secondaryLabel="Download a ValetudoMap data export to use with other tools"
+            primaryLabel={t("mapManagement.exportValetudoMap")}
+            secondaryLabel={t("mapManagement.exportValetudoMapDescription")}
             icon={<ValetudoMapDownloadIcon/>}
-            buttonLabel="Go"
+            buttonLabel={t("mapManagement.go")}
             action={() => {
                 if (valetudoInformation && mapData) {
                     const timestamp = new Date().toISOString().replaceAll(":","-").split(".")[0];
@@ -158,6 +164,7 @@ const ValetudoMapDataExportButtonItem = (): React.ReactElement => {
 };
 
 const MapManagement = (): React.ReactElement => {
+    const {t} = useTranslation();
     const [
         persistentMapControlCapabilitySupported,
         mappingPassCapabilitySupported,
@@ -218,8 +225,8 @@ const MapManagement = (): React.ReactElement => {
                 <LinkListMenuItem
                     key="segmentManagement"
                     url="/options/map_management/segments"
-                    primaryLabel="Segment Management"
-                    secondaryLabel="Modify the maps segments"
+                    primaryLabel={t("mapManagement.segmentManagement")}
+                    secondaryLabel={t("mapManagement.segmentManagementDescription")}
                     icon={<SegmentEditIcon/>}
                 />
             );
@@ -230,8 +237,8 @@ const MapManagement = (): React.ReactElement => {
                 <LinkListMenuItem
                     key="virtualRestrictionManagement"
                     url="/options/map_management/virtual_restrictions"
-                    primaryLabel="Virtual Restriction Management"
-                    secondaryLabel="Create, modify and delete various virtual restrictions"
+                    primaryLabel={t("mapManagement.virtualRestrictionManagement")}
+                    secondaryLabel={t("mapManagement.virtualRestrictionManagementDescription")}
                     icon={<VirtualRestrictionsIcon/>}
                 />
             );
@@ -245,7 +252,8 @@ const MapManagement = (): React.ReactElement => {
 
         combinedVirtualRestrictionsCapabilitySupported,
         mapSegmentEditCapabilitySupported,
-        mapSegmentRenameCapabilitySupported
+        mapSegmentRenameCapabilitySupported,
+        t
     ]);
 
     const utilityMapItems = React.useMemo(() => {
@@ -253,27 +261,27 @@ const MapManagement = (): React.ReactElement => {
             <LinkListMenuItem
                 key="robotCoverageMap"
                 url="/options/map_management/robot_coverage"
-                primaryLabel="Robot Coverage Map"
-                secondaryLabel="Check the robots coverage"
+                primaryLabel={t("mapManagement.robotCoverageMap")}
+                secondaryLabel={t("mapManagement.robotCoverageMapDescription")}
                 icon={<CleanupCoverageIcon/>}
             />,
             <ValetudoMapDataExportButtonItem key="valetudoMapDataExport" />
         ];
-    }, []);
+    }, [t]);
 
     return (
         <PaperContainer>
             <ListMenu
-                primaryHeader={"Robot-managed Map Features"}
-                secondaryHeader={"These features are managed and provided by the robot's firmware"}
+                primaryHeader={t("mapManagement.robotManagedMapFeatures")}
+                secondaryHeader={t("mapManagement.robotManagedMapFeaturesDescription")}
                 listItems={robotManagedListItems}
-                helpText={MapManagementHelp}
+                helpText={i18n.language?.toLowerCase().startsWith("ru") ? MapManagementHelpRu : MapManagementHelp}
             />
             <ListMenu
-                primaryHeader={"Map Utilities"}
-                secondaryHeader={"Do neat things with the map"}
+                primaryHeader={t("mapManagement.mapUtilities")}
+                secondaryHeader={t("mapManagement.mapUtilitiesDescription")}
                 listItems={utilityMapItems}
-                helpText={MapUtilitiesHelp}
+                helpText={i18n.language?.toLowerCase().startsWith("ru") ? MapUtilitiesHelpRu : MapUtilitiesHelp}
                 style={{marginTop: "1rem"}}
             />
         </PaperContainer>

@@ -24,9 +24,11 @@ import TimerEditDialog from "./TimerEditDialog";
 import { deepCopy } from "../../utils";
 import {Help as HelpIcon} from "@mui/icons-material";
 import HelpDialog from "../../components/HelpDialog";
-import {TimersHelp} from "./res/TimersHelp";
+import {TimersHelp, TimersHelpRu} from "./res/TimersHelp";
 import PaperContainer from "../../components/PaperContainer";
 import {convertTimer} from "./TimerUtils";
+import {useTranslation} from "react-i18next";
+import i18n from "../../i18n";
 
 const timerTemplate: Timer = {
     id: "",
@@ -41,6 +43,7 @@ const timerTemplate: Timer = {
 };
 
 const Timers = (): React.ReactElement => {
+    const {t} = useTranslation();
     const {
         data: timerData,
         isPending: timerDataPending,
@@ -110,7 +113,7 @@ const Timers = (): React.ReactElement => {
     }
 
     if (timerDataError || timerPropertiesError || !timerPropertiesData) {
-        return <Typography color="error">Error loading timers</Typography>;
+        return <Typography color="error">{t("timers.errorLoadingTimers")}</Typography>;
     }
 
     return (
@@ -121,7 +124,7 @@ const Timers = (): React.ReactElement => {
                         onClick={() => {
                             return setHelpDialogOpen(true);
                         }}
-                        title="Help"
+                        title={t("timers.help")}
                     >
                         <HelpIcon/>
                     </IconButton>
@@ -133,7 +136,7 @@ const Timers = (): React.ReactElement => {
                             <Typography
                                 sx={{padding:"1rem", textAlign: "center", marginTop: "10vh", marginBottom: "5vh"}}
                             >
-                                You currently don&apos;t have any timers configured in Valetudo.
+                                {t("timers.noTimersConfigured")}
                             </Typography>
                     }
                 </Grid2>
@@ -169,7 +172,7 @@ const Timers = (): React.ReactElement => {
                         color="primary"
                         aria-label="add"
                         onClick={addTimer}
-                        title="Add new timer"
+                        title={t("timers.addNewTimer")}
                     >
                         <AddIcon />
                     </Fab>
@@ -180,7 +183,7 @@ const Timers = (): React.ReactElement => {
                 setDialogOpen={(open: boolean) => {
                     setHelpDialogOpen(open);
                 }}
-                helpText={TimersHelp}
+                helpText={i18n.language?.toLowerCase().startsWith("ru") ? TimersHelpRu : TimersHelp}
             />
         </PaperContainer>
     );

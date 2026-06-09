@@ -24,8 +24,11 @@ import {
     VpnKey as BasicAuthIcon
 } from "@mui/icons-material";
 import DetailPageHeaderRow from "../../components/DetailPageHeaderRow";
+import {useTranslation} from "react-i18next";
 
 const AuthSettings = (): React.ReactElement => {
+    const {t} = useTranslation();
+
     const {
         data: storedConfiguration,
         isPending: configurationPending,
@@ -56,7 +59,7 @@ const AuthSettings = (): React.ReactElement => {
     }
 
     if (configurationError || !storedConfiguration) {
-        return <Typography color="error">Error loading HTTP Basic Auth configuration</Typography>;
+        return <Typography color="error">{t("connectivity.auth.loadError")}</Typography>;
     }
 
     return (
@@ -71,14 +74,14 @@ const AuthSettings = (): React.ReactElement => {
                         }}
                     />
                 }
-                label="HTTP Basic Auth enabled"
+                label={t("connectivity.auth.enabled")}
                 sx={{mb: 1}}
             />
             <Grid2 container spacing={1} sx={{mb: 1}} direction="row">
                 <Grid2 size="grow" style={{flexGrow: 1}}>
                     <TextField
                         style={{width: "100%"}}
-                        label="Username"
+                        label={t("connectivity.auth.username")}
                         value={username}
                         variant="standard"
                         disabled={!enabled}
@@ -90,7 +93,7 @@ const AuthSettings = (): React.ReactElement => {
                 </Grid2>
                 <Grid2 size="grow" style={{flexGrow: 1}}>
                     <FormControl style={{width: "100%"}} variant="standard">
-                        <InputLabel htmlFor="standard-adornment-password">Password</InputLabel>
+                        <InputLabel htmlFor="standard-adornment-password">{t("connectivity.auth.password")}</InputLabel>
                         <Input
                             type={showPasswordAsPlain ? "text" : "password"}
                             fullWidth
@@ -128,16 +131,11 @@ const AuthSettings = (): React.ReactElement => {
                 }}
             >
                 <Typography color="info">
-                    Valetudo will by default try to block access from public-routable IP addresses
-                    for your safety and convenience.
+                    {t("connectivity.auth.infoLine1")}
                     <br/>
-                    If you want to allow external access to your Valetudo instance, consider using a VPN such as
-                    WireGuard or OpenVPN to ensure the safety of your network.
+                    {t("connectivity.auth.infoLine2")}
                     <br/><br/>
-                    If you don&apos;t want to use a VPN, usage of a reverse proxy in front of Valetudo and all of your
-                    other IoT and network services (e.g. Home Assistant, Jellyfin) is strongly recommended.
-                    A proper Webserver (e.g. nginx, Apache) is engineered and hardened to be public-facing.
-                    Additionally, a setup like that provides you with central access logs and the ability to implement a central auth.
+                    {t("connectivity.auth.infoLine3")}
                 </Typography>
             </InfoBox>
 
@@ -158,7 +156,7 @@ const AuthSettings = (): React.ReactElement => {
                             setConfigurationModified(false);
                         }}
                     >
-                        Save configuration
+                        {t("connectivity.common.saveConfiguration")}
                     </Button>
                 </Grid2>
             </Grid2>
@@ -167,12 +165,14 @@ const AuthSettings = (): React.ReactElement => {
 };
 
 const AuthSettingsPage = (): React.ReactElement => {
+    const {t} = useTranslation();
+
     return (
         <PaperContainer>
             <Grid2 container direction="row">
                 <Box style={{width: "100%"}}>
                     <DetailPageHeaderRow
-                        title="HTTP Basic Auth"
+                        title={t("connectivity.auth.pageTitle")}
                         icon={<BasicAuthIcon/>}
                     />
                     <AuthSettings/>
