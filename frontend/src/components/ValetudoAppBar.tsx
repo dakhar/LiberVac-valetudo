@@ -32,7 +32,6 @@ import {
     SystemUpdateAlt as UpdaterIcon,
     SettingsRemote as SettingsRemoteIcon,
     GitHub as GithubIcon,
-    Favorite as DonateIcon,
     MenuBook as DocsIcon,
     Wysiwyg as SystemInformationIcon,
     Info as AboutIcon,
@@ -315,9 +314,9 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
         });
 
         if (ret !== "") {
-            document.title = `Valetudo - ${ret}`;
+            document.title = `LiberVac - ${ret}`;
         } else {
-            document.title = "Valetudo";
+            document.title = "LiberVac";
         }
 
         return t(currentMenuEntry.titleKey);
@@ -520,19 +519,7 @@ const ValetudoAppBar: React.FunctionComponent<{ paletteMode: PaletteMode, setPal
                         <ListItemIcon>
                             <GithubIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Hypfer/Valetudo"/>
-                    </ListItemButton>
-                    <ListItemButton
-                        component="a"
-                        href="https://github.com/sponsors/Hypfer"
-                        target="_blank"
-                        rel="noopener"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <ListItemIcon>
-                            <DonateIcon/>
-                        </ListItemIcon>
-                        <ListItemText primary={t("nav.donate")}/>
+                        <ListItemText primary="Hypfer/Valetudo (upstream)"/>
                     </ListItemButton>
 
 

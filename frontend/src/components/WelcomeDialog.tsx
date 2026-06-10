@@ -5,7 +5,6 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Link,
     Paper,
     Typography
 } from "@mui/material";
@@ -17,7 +16,7 @@ import {ButtonListMenuItem} from "./list_menu/ButtonListMenuItem";
 import {
     Layers as MappingPassIcon
 } from "@mui/icons-material";
-import {Trans, useTranslation} from "react-i18next";
+import {useTranslation} from "react-i18next";
 
 const FullCleanupButtonItem = (): React.ReactElement => {
     const {t} = useTranslation();
@@ -132,14 +131,6 @@ const WelcomeDialog: FunctionComponent<{open: boolean, hide: () => void}> = ({
                     }
                     <br/>
                     <Typography>
-                        <Trans
-                            t={t}
-                            i18nKey="components.welcome.donation"
-                            components={{
-                                donationLink: <Link href="https://github.com/sponsors/Hypfer" target="_blank" rel="noopener"/>
-                            }}
-                        />
-                        <br/><br/>
                         {t("components.welcome.enjoy")}
                     </Typography>
                 </DialogContentText>
