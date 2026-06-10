@@ -5,7 +5,7 @@
     "es6": true,
     "node": true
   },
-  "plugins": ["jsdoc", "sort-keys-fix", "sort-requires", "node", "regexp"],
+  "plugins": ["jsdoc", "sort-keys-fix", "node", "regexp"],
   "extends": ["eslint:recommended", "plugin:regexp/recommended"],
   "globals": {
     "Atomics": "readonly",
@@ -57,7 +57,6 @@
     "jsdoc/require-param-type": "error",
     "jsdoc/require-returns-check": "error",
     "jsdoc/require-returns-type": "error",
-    "sort-requires/sort-requires": "warn",
     "operator-linebreak": ["error", "after"],
     "no-unneeded-ternary": ["error", { "defaultAssignment": false }],
     "regexp/no-unused-capturing-group": "off",

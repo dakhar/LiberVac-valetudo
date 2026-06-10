@@ -1,9 +1,34 @@
-const hashlru = require("hashlru");
 const isInSubnet = require("is-in-subnet");
 const Logger = require("../../Logger");
 const Tools = require("../../utils/Tools");
 
-const IPAccessLRU = hashlru(15);
+// Small insertion-order LRU cache for IP allow/deny decisions.
+// Inlined to drop the external hashlru dependency; 15 entries is plenty for the
+// handful of distinct client IPs a robot ever sees, and exact eviction order is
+// irrelevant for caching boolean access checks.
+const IP_ACCESS_CACHE_SIZE = 15;
+const IPAccessLRU = (function() {
+    const entries = new Map();
+
+    return {
+        has: function(key) {
+            return entries.has(key);
+        },
+        get: function(key) {
+            return entries.get(key);
+        },
+        set: function(key, value) {
+            if (entries.has(key)) {
+                entries.delete(key);
+            }
+            entries.set(key, value);
+
+            if (entries.size > IP_ACCESS_CACHE_SIZE) {
+                entries.delete(entries.keys().next().value);
+            }
+        }
+    };
+})();
 
 /**
  *
