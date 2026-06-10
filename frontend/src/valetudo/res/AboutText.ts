@@ -1,55 +1,72 @@
 export const AboutText = `
-Valetudo is made, managed, maintained and more by me,
-<a href="https://hypfer.de" rel="noopener" target="_blank">Sören Beye</a>, with occasional contributions by
-<a href="https://github.com/Hypfer/Valetudo/graphs/contributors" rel="noopener" target="_blank">these awesome people</a>.
-It would not exist without the ongoing work of <a href="https://dontvacuum.me/" rel="noopener" target="_blank">Dennis Giese</a>, 
-who is providing us with ways of liberating and gaining actual ownership of our robots.
+**LiberVac** is a fork of <a href="https://github.com/Hypfer/Valetudo" rel="noopener" target="_blank">Valetudo</a>,
+adapted to bring fully local, cloud-free control to robots that the stock firmware otherwise chains to a vendor cloud.
 
-Initially, the idea was to have a list of all open-source libraries and tools used in the making of Valetudo here,
-however, it was quickly discovered that that would not be viable, as an exhaustive list including all transitive
-dependencies contains thousands of projects.
+### This fork
 
-We're all standing on the shoulders of giants. (<a href="https://xkcd.com/2347/" rel="noopener" target="_blank">XKCD 2347</a>)
+LiberVac is maintained by <a href="https://github.com/dakhar" rel="noopener" target="_blank">**dakhar**</a>. The work on top of upstream Valetudo focuses on the
+Midea V16 (RK3566) platform and on cutting the cord to the manufacturer's cloud:
+
+- A local bridge to the robot's on-device services, so cleaning, room selection, the map and live status
+work entirely on your LAN — no Midea or Agora cloud in the loop.
+- The on-board camera surfaced directly in the web interface (local RTSP → go2rtc → WebRTC), without any cloud relay.
+- Re-voiced audio packs and assorted quality-of-life fixes for the device.
+- This rebrand and the packaging that ties it all together.
+
+### Thanks
+
+None of this would exist without the people whose shoulders it stands on, and they deserve full credit:
+
+- <a href="https://hypfer.de" rel="noopener" target="_blank">Sören Beye (Hypfer)</a> — the author of Valetudo.
+LiberVac is built on years of his work, and the entire architecture, capability model and web interface are his.
+Thank you.
+- <a href="https://dontvacuum.me/" rel="noopener" target="_blank">Dennis Giese</a> — whose research into liberating
+and actually owning our robots makes all of this possible in the first place.
+- The <a href="https://github.com/Hypfer/Valetudo/graphs/contributors" rel="noopener" target="_blank">Valetudo contributors</a>
+and the countless open-source projects underneath. We're all standing on the shoulders of giants.
+(<a href="https://xkcd.com/2347/" rel="noopener" target="_blank">XKCD 2347</a>)
 
 ### License
 
-Valetudo is licensed under <a href="https://github.com/Hypfer/Valetudo/blob/master/LICENSE" rel="noopener" target="_blank">the Apache-2.0 license</a>,
-but I will spare you the boring wall of text that you won't read anyways, as honestly, the license doesn't really matter that much.
-All relevant open-source licenses basically boil down to "no warranty/no liability" and "don't act in bad faith" with various ways of trying to enforce the latter.
-
-Unfortunately though, reality has shown us that actually doing so often isn't a feasible task.
-People still either ignore the license agreement entirely or slyly try to find some way of working around it in a legally
-acceptable but obviously incorrect way.
-
-Thus, I might as well paste ten pages of lorem ipsum here.
+LiberVac, like Valetudo, is distributed under
+<a href="https://github.com/Hypfer/Valetudo/blob/master/LICENSE" rel="noopener" target="_blank">the Apache-2.0 license</a>.
+LiberVac is an independent fork and is **not** affiliated with or endorsed by the Valetudo project or its author.
 
 Just be nice, please. Thank you :)
 `;
 
 export const AboutTextRu = `
-Valetudo создаёт, развивает, поддерживает и многое другое делаю я,
-<a href="https://hypfer.de" rel="noopener" target="_blank">Sören Beye</a>, при периодическом участии
-<a href="https://github.com/Hypfer/Valetudo/graphs/contributors" rel="noopener" target="_blank">этих замечательных людей</a>.
-Он бы не существовал без непрекращающейся работы <a href="https://dontvacuum.me/" rel="noopener" target="_blank">Dennis Giese</a>,
-который предоставляет нам способы освобождения наших роботов и получения реального права собственности на них.
+**LiberVac** — это форк <a href="https://github.com/Hypfer/Valetudo" rel="noopener" target="_blank">Valetudo</a>,
+адаптированный для полностью локального управления роботами без облака, к которому их привязывает заводская прошивка.
 
-Изначально была идея разместить здесь список всех библиотек и инструментов с открытым исходным кодом,
-использованных при создании Valetudo, однако быстро выяснилось, что это нереально, так как исчерпывающий список,
-включающий все транзитивные зависимости, содержит тысячи проектов.
+### Об этом форке
 
-Мы все стоим на плечах гигантов. (<a href="https://xkcd.com/2347/" rel="noopener" target="_blank">XKCD 2347</a>)
+LiberVac поддерживает <a href="https://github.com/dakhar" rel="noopener" target="_blank">**dakhar**</a>. Работа поверх оригинального Valetudo сосредоточена на платформе
+Midea V16 (RK3566) и на том, чтобы перерезать пуповину с облаком производителя:
+
+- Локальный мост к сервисам робота: уборка, выбор комнат, карта и статус в реальном времени работают целиком
+в вашей локальной сети — без облаков Midea и Agora.
+- Встроенная камера прямо в веб-интерфейсе (локально RTSP → go2rtc → WebRTC), без облачного ретранслятора.
+- Переозвученные голосовые пакеты и набор улучшений для устройства.
+- Сам ребрендинг и сборка, связывающая всё воедино.
+
+### Благодарности
+
+Ничего этого не было бы без людей, на плечах которых всё это стоит, и они заслуживают полного признания:
+
+- <a href="https://hypfer.de" rel="noopener" target="_blank">Sören Beye (Hypfer)</a> — автор Valetudo.
+LiberVac построен на годах его труда; вся архитектура, модель возможностей и веб-интерфейс — его заслуга. Спасибо.
+- <a href="https://dontvacuum.me/" rel="noopener" target="_blank">Dennis Giese</a> — чьи исследования по освобождению
+роботов и получению реального права собственности на них и делают всё это возможным.
+- <a href="https://github.com/Hypfer/Valetudo/graphs/contributors" rel="noopener" target="_blank">Контрибьюторы Valetudo</a>
+и бесчисленные проекты с открытым исходным кодом под капотом. Мы все стоим на плечах гигантов.
+(<a href="https://xkcd.com/2347/" rel="noopener" target="_blank">XKCD 2347</a>)
 
 ### Лицензия
 
-Valetudo распространяется под <a href="https://github.com/Hypfer/Valetudo/blob/master/LICENSE" rel="noopener" target="_blank">лицензией Apache-2.0</a>,
-но я избавлю вас от скучной стены текста, которую вы всё равно не прочитаете, ведь, честно говоря, лицензия не так уж и важна.
-Все значимые лицензии с открытым исходным кодом по сути сводятся к «без гарантий/без ответственности» и «не действуйте недобросовестно» с различными способами попыток обеспечить соблюдение последнего.
-
-К сожалению, реальность показала нам, что на деле сделать это зачастую невыполнимая задача.
-Люди по-прежнему либо полностью игнорируют лицензионное соглашение, либо хитро пытаются найти какой-нибудь способ его обойти юридически
-приемлемым, но очевидно некорректным образом.
-
-Так что я с тем же успехом мог бы вставить сюда десять страниц lorem ipsum.
+LiberVac, как и Valetudo, распространяется под
+<a href="https://github.com/Hypfer/Valetudo/blob/master/LICENSE" rel="noopener" target="_blank">лицензией Apache-2.0</a>.
+LiberVac — независимый форк, **не** аффилированный с проектом Valetudo и его автором и не одобренный ими.
 
 Просто будьте добрее, пожалуйста. Спасибо :)
 `;
