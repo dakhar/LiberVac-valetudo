@@ -99,7 +99,8 @@ class GithubValetudoUpdateProvider extends ValetudoUpdateProvider {
 
 GithubValetudoUpdateProvider.TYPE = "github";
 
-GithubValetudoUpdateProvider.RELEASES_URL = "https://api.github.com/repos/Hypfer/Valetudo/releases";
+// LiberVac: pull releases from our own public GitHub repo instead of Hypfer/Valetudo.
+GithubValetudoUpdateProvider.RELEASES_URL = "https://api.github.com/repos/dakhar/LiberVac-valetudo/releases";
 GithubValetudoUpdateProvider.MANIFEST_NAME = "valetudo_release_manifest.json";
 
 

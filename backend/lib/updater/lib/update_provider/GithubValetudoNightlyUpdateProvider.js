@@ -89,8 +89,12 @@ class GithubValetudoNightlyUpdateProvider extends ValetudoUpdateProvider {
 
 GithubValetudoNightlyUpdateProvider.TYPE = "github_nightly";
 
-GithubValetudoNightlyUpdateProvider.REPO_URL = "https://api.github.com/repos/Hypfer/valetudo-nightly-builds/branches/master";
-GithubValetudoNightlyUpdateProvider.ASSET_BASE_URL = "https://raw.githubusercontent.com/Hypfer/valetudo-nightly-builds/master/";
+// LiberVac: pull nightly builds from our own public repo instead of Hypfer/valetudo-nightly-builds.
+// Note: nightlies use a raw-file/branch layout, not GitHub releases — create the public
+// dakhar/libervac-nightly-builds repo if you want a working nightly channel; otherwise this
+// channel just finds nothing (and never touches Hypfer).
+GithubValetudoNightlyUpdateProvider.REPO_URL = "https://api.github.com/repos/dakhar/libervac-nightly-builds/branches/master";
+GithubValetudoNightlyUpdateProvider.ASSET_BASE_URL = "https://raw.githubusercontent.com/dakhar/libervac-nightly-builds/master/";
 GithubValetudoNightlyUpdateProvider.MANIFEST_NAME = "valetudo_release_manifest.json";
 
 GithubValetudoNightlyUpdateProvider.BINARY_NAMES = {
