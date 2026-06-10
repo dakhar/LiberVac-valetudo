@@ -179,7 +179,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
     ) {
         return (
             <Typography color="error">
-                    {t("timers.errorLoadingCapability", {capability: Capability.MapSegmentation})}
+                {t("timers.errorLoadingCapability", {capability: Capability.MapSegmentation})}
             </Typography>
         );
     }
@@ -204,7 +204,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
         <>
             <FormControl>
                 <InputLabel id="segment-iterations-label">
-                        {t("timers.iterations")}
+                    {t("timers.iterations")}
                 </InputLabel>
                 <Select
                     labelId="segment-iterations-label"
@@ -246,7 +246,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
                 dense
                 subheader={
                     <ListSubheader component="div" sx={{userSelect: "none"}}>
-                            {t("timers.availableSegments")}
+                        {t("timers.availableSegments")}
                     </ListSubheader>
                 }
             >
@@ -257,7 +257,7 @@ export const SegmentCleanupActionControls: FunctionComponent<TimerActionControlP
                 dense
                 subheader={
                     <ListSubheader component="div" sx={{userSelect: "none"}}>
-                            {t("timers.selectedSegments")}
+                        {t("timers.selectedSegments")}
                     </ListSubheader>
                 }
             >
