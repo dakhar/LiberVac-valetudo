@@ -1,150 +1,146 @@
-{
-  'name': 'Release',
-  'on': { 'release': { 'types': ['published'] } },
-  'jobs':
-    {
-      'publish-release':
-        {
-          'runs-on': 'ubuntu-latest',
-          'strategy': { 'matrix': { 'node-version': ['22.x'] } },
-          'steps':
-            [
-              { 'uses': 'actions/checkout@v6' },
-              {
-                'name': 'Use Node.js ${{ matrix.node-version }}',
-                'uses': 'actions/setup-node@v6',
-                'with': { 'node-version': '${{ matrix.node-version }}' },
-              },
-              { 'name': 'Install', 'run': 'npm ci' },
-              {
-                'name': 'Generate OpenAPI Docs',
-                'run': 'npm run build_openapi_schema',
-              },
-              {
-                'name': 'Build Valetudo frontend',
-                'run': 'npm run build --workspace=frontend',
-              },
-              {
-                'name': 'Build Valetudo armv7',
-                'run': 'npm run build_armv7 --workspace=backend',
-              },
-              {
-                'name': 'Build Valetudo armv7 lowmem',
-                'run': 'npm run build_armv7_lowmem --workspace=backend',
-              },
-              {
-                'name': 'Build Valetudo aarch64',
-                'run': 'npm run build_aarch64 --workspace=backend',
-              },
+name: Release
 
-              {
-                'name': 'Upload Valetudo armv7',
-                'uses': 'hypfer/upload-release-asset@v1.2.0',
-                'env': { 'GITHUB_TOKEN': '${{ secrets.GITHUB_TOKEN }}' },
-                'with':
-                  {
-                    'upload_url': '${{ github.event.release.upload_url }}',
-                    'asset_path': './build/armv7/valetudo',
-                    'asset_name': 'valetudo-armv7',
-                    'asset_content_type': 'binary/octet-stream',
-                  },
-              },
-              {
-                'name': 'Upload Valetudo armv7 lowmem',
-                'uses': 'hypfer/upload-release-asset@v1.2.0',
-                'env': { 'GITHUB_TOKEN': '${{ secrets.GITHUB_TOKEN }}' },
-                'with':
-                  {
-                    'upload_url': '${{ github.event.release.upload_url }}',
-                    'asset_path': './build/armv7/valetudo-lowmem',
-                    'asset_name': 'valetudo-armv7-lowmem',
-                    'asset_content_type': 'binary/octet-stream',
-                  },
-              },
-              {
-                'name': 'Upload Valetudo aarch64',
-                'uses': 'hypfer/upload-release-asset@v1.2.0',
-                'env': { 'GITHUB_TOKEN': '${{ secrets.GITHUB_TOKEN }}' },
-                'with':
-                  {
-                    'upload_url': '${{ github.event.release.upload_url }}',
-                    'asset_path': './build/aarch64/valetudo',
-                    'asset_name': 'valetudo-aarch64',
-                    'asset_content_type': 'binary/octet-stream',
-                  },
-              },
+# Builds the LiberVac binaries + release manifest and attaches them to a GitHub Release
+# of THIS repo (dakhar/LiberVac-valetudo). The in-app updater pulls from exactly these
+# release assets, so the asset names and the manifest must line up (see notes below).
+#
+# IMPORTANT:
+#   * The GitHub Release tag MUST equal the version in package.json (currently CalVer,
+#     e.g. "2026.05.0"). The updater rejects a manifest whose `version` != release tag.
+#     A guard step below fails the run early if they don't match.
+#   * Binary asset names are kept as `valetudo-<arch>[...]` on purpose — that name is
+#     hardcoded in the updater (backend ValetudoUpdaterCheckStep.js) and in the manifest
+#     generator (util/build_release_manifest.js). Do not rename them.
+#   * Asset upload uses the `gh` CLI (built into GitHub-hosted runners) instead of any
+#     third-party action, to keep the supply chain under our own control.
 
-              {
-                'name': 'UPX-compress valetudo binaries',
-                'run': 'npm run upx',
-              },
-              {
-                'name': 'Upload Valetudo armv7.upx',
-                'uses': 'hypfer/upload-release-asset@v1.2.0',
-                'env': { 'GITHUB_TOKEN': '${{ secrets.GITHUB_TOKEN }}' },
-                'with':
-                  {
-                    'upload_url': '${{ github.event.release.upload_url }}',
-                    'asset_path': './build/armv7/valetudo.upx',
-                    'asset_name': 'valetudo-armv7.upx',
-                    'asset_content_type': 'binary/octet-stream',
-                  },
-              },
-              {
-                'name': 'Upload Valetudo armv7 lowmem.upx',
-                'uses': 'hypfer/upload-release-asset@v1.2.0',
-                'env': { 'GITHUB_TOKEN': '${{ secrets.GITHUB_TOKEN }}' },
-                'with':
-                  {
-                    'upload_url': '${{ github.event.release.upload_url }}',
-                    'asset_path': './build/armv7/valetudo-lowmem.upx',
-                    'asset_name': 'valetudo-armv7-lowmem.upx',
-                    'asset_content_type': 'binary/octet-stream',
-                  },
-              },
-              {
-                'name': 'Upload Valetudo aarch64.upx',
-                'uses': 'hypfer/upload-release-asset@v1.2.0',
-                'env': { 'GITHUB_TOKEN': '${{ secrets.GITHUB_TOKEN }}' },
-                'with':
-                  {
-                    'upload_url': '${{ github.event.release.upload_url }}',
-                    'asset_path': './build/aarch64/valetudo.upx',
-                    'asset_name': 'valetudo-aarch64.upx',
-                    'asset_content_type': 'binary/octet-stream',
-                  },
-              },
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to attach the built assets to (must equal package.json version). Leave empty to only produce a downloadable workflow artifact."
+        required: false
+        default: ""
 
-              {
-                'name': 'Build manifest',
-                'run': 'npm run build_release_manifest',
-              },
-              {
-                'name': 'Upload manifest',
-                'uses': 'hypfer/upload-release-asset@v1.2.0',
-                'env': { 'GITHUB_TOKEN': '${{ secrets.GITHUB_TOKEN }}' },
-                'with':
-                  {
-                    'upload_url': '${{ github.event.release.upload_url }}',
-                    'asset_path': './build/valetudo_release_manifest.json',
-                    'asset_name': 'valetudo_release_manifest.json',
-                    'asset_content_type': 'application/json',
-                  },
-              },
-              
-              {
-                'name': 'Upload OpenAPI spec',
-                'uses': 'hypfer/upload-release-asset@v1.2.0',
-                'env': { 'GITHUB_TOKEN': '${{ secrets.GITHUB_TOKEN }}' },
-                'with':
-                  {
-                    'upload_url': '${{ github.event.release.upload_url }}',
-                    'asset_path': './build/valetudo.openapi.schema.json',
-                    'asset_name': 'valetudo.openapi.schema.json',
-                    'asset_content_type': 'application/json',
-                  },
-              },
-            ],
-        },
-    },
-}
+permissions:
+  contents: write
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["22.x"]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Verify release tag matches package.json version
+        if: github.event_name == 'release'
+        run: |
+          PKG="$(node -p "require('./package.json').version")"
+          TAG="${{ github.event.release.tag_name }}"
+          echo "package.json version: $PKG"
+          echo "release tag:          $TAG"
+          if [ "$PKG" != "$TAG" ]; then
+            echo "::error::Release tag '$TAG' must equal package.json version '$PKG', otherwise the in-app updater will reject the manifest."
+            exit 1
+          fi
+
+      # npm install (not npm ci) because the Hypfer git build-time devDeps were removed
+      # and package-lock.json may not yet be regenerated/committed. Switch back to
+      # `npm ci` once a refreshed lockfile is committed for reproducible installs.
+      - name: Install
+        run: npm install --no-audit --no-fund
+
+      - name: Generate OpenAPI Docs
+        run: npm run build_openapi_schema
+
+      - name: Generate Code
+        run: npm run generate_code --workspace=backend
+
+      - name: TypeScript check
+        run: npm run ts-check --workspace={frontend,backend}
+
+      - name: Lint
+        run: npm run lint --workspace={frontend,backend}
+
+      - name: Build frontend
+        run: npm run build --workspace=frontend
+
+      - name: Build armv7
+        run: npm run build_armv7 --workspace=backend
+
+      - name: Build armv7 lowmem
+        run: npm run build_armv7_lowmem --workspace=backend
+
+      - name: Build aarch64
+        run: npm run build_aarch64 --workspace=backend
+
+      # UPX variants are only needed by low-storage hosts. The step is best-effort:
+      # if it fails, the release still ships the uncompressed binaries.
+      - name: Install UPX
+        continue-on-error: true
+        run: sudo apt-get update && sudo apt-get install -y upx-ucl
+
+      - name: UPX-compress binaries
+        id: upx
+        continue-on-error: true
+        run: npm run upx
+
+      - name: Build release manifest
+        run: npm run build_release_manifest
+
+      - name: Stage release assets
+        run: |
+          set -eu
+          mkdir -p dist
+
+          # Core binaries (always present)
+          cp build/armv7/valetudo                 dist/valetudo-armv7
+          cp build/armv7/valetudo-lowmem          dist/valetudo-armv7-lowmem
+          cp build/aarch64/valetudo               dist/valetudo-aarch64
+
+          # UPX variants (only if the best-effort step produced them)
+          [ -f build/armv7/valetudo.upx ]         && cp build/armv7/valetudo.upx        dist/valetudo-armv7.upx        || echo "skip valetudo-armv7.upx"
+          [ -f build/armv7/valetudo-lowmem.upx ]  && cp build/armv7/valetudo-lowmem.upx dist/valetudo-armv7-lowmem.upx || echo "skip valetudo-armv7-lowmem.upx"
+          [ -f build/aarch64/valetudo.upx ]       && cp build/aarch64/valetudo.upx      dist/valetudo-aarch64.upx      || echo "skip valetudo-aarch64.upx"
+
+          # Manifest + OpenAPI schema
+          cp build/valetudo_release_manifest.json dist/valetudo_release_manifest.json
+          cp build/valetudo.openapi.schema.json   dist/valetudo.openapi.schema.json
+
+          echo "Staged assets:"
+          ls -la dist
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libervac-binaries
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Attach assets to the GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          TAG="${{ github.event.release.tag_name }}"
+          if [ -z "$TAG" ]; then
+            TAG="${{ github.event.inputs.tag }}"
+          fi
+
+          if [ -z "$TAG" ]; then
+            echo "No release tag provided (manual run without 'tag' input)."
+            echo "Binaries are available as the 'libervac-binaries' workflow artifact above."
+            exit 0
+          fi
+
+          echo "Uploading assets to release '$TAG'..."
+          gh release upload "$TAG" dist/* --clobber --repo "${{ github.repository }}"
