@@ -471,6 +471,52 @@ class MideaQuirkFactory {
                     }
                 });
 
+            case MideaQuirkFactory.KNOWN_QUIRKS.CRISSCROSS_MODE:
+                return new Quirk({
+                    id: id,
+                    title: "Crisscross Cleaning",
+                    description: "When enabled, the robot mops in a crisscross (#-shaped) pattern with multiple passes for a more thorough result at the cost of a longer runtime.",
+                    options: ["off", "on"],
+                    getter: async () => {
+                        const response = await this.robot.sendCommand(new MSmartPacket({
+                            messageType: MSmartPacket.MESSAGE_TYPE.ACTION,
+                            payload: MSmartPacket.buildPayload(MSmartConst.ACTION.GET_STATUS)
+                        }).toHexString());
+                        const parsedResponse = BEightParser.PARSE(response);
+
+                        if (parsedResponse instanceof MSmartStatusDTO) {
+                            return parsedResponse.pound_sign_switch ? "on" : "off";
+                        } else {
+                            throw new Error("Invalid response from robot");
+                        }
+                    },
+                    setter: async (value) => {
+                        let val;
+
+                        switch (value) {
+                            case "off":
+                                val = 0;
+                                break;
+                            case "on":
+                                val = 1;
+                                break;
+                            default:
+                                throw new Error(`Invalid crisscross cleaning value: ${value}`);
+                        }
+
+                        await this.robot.sendCommand(new MSmartPacket({
+                            messageType: MSmartPacket.MESSAGE_TYPE.SETTING,
+                            payload: MSmartPacket.buildPayload(
+                                MSmartConst.SETTING.SET_VARIOUS_TOGGLES,
+                                Buffer.from([
+                                    0x18, // pound-sign / crisscross mode
+                                    val
+                                ])
+                            )
+                        }).toHexString());
+                    }
+                });
+
             case MideaQuirkFactory.KNOWN_QUIRKS.MOP_DOCK_MOP_CLEANING_FREQUENCY:
                 return new Quirk({
                     id: id,
@@ -807,6 +853,7 @@ MideaQuirkFactory.KNOWN_QUIRKS = {
     MOP_DOCK_SELF_CLEANING_FREQUENCY: "8aa6f147-dbcc-44f6-a9f9-2a7f4fb59c7e",
     THRESHOLD_RECOGNITION: "2fa33876-f5ad-444d-9084-d51eb7be4670",
     BRIDGE_BOOST: "17d539ff-51d3-49be-8b9e-29aa1e9c8d39",
+    CRISSCROSS_MODE: "b8e6c4f1-2d7a-4e93-a5c8-1f0b9d3e6a72",
 };
 
 module.exports = MideaQuirkFactory;

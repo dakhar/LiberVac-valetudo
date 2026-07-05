@@ -33,6 +33,7 @@ import {
     MapSegmentMaterialControlProperties,
     MapSegmentMaterialControlRequestParameters,
     MapSegmentRenameRequestParameters,
+    MapSegmentRenumberRequestParameters,
     MopDockMopDryingDuration,
     MopDockMopDryingTimeControlProperties,
     MopDockMopDryingTimePayload,
@@ -367,6 +368,19 @@ export const sendRenameSegmentCommand = async (
             action: "rename_segment",
             segment_id: parameters.segment_id,
             name: parameters.name
+        }
+    );
+};
+
+export const sendSetSegmentNumberCommand = async (
+    parameters: MapSegmentRenumberRequestParameters
+): Promise<void> => {
+    await valetudoAPI.put(
+        `/robot/capabilities/${Capability.MapSegmentRenumber}`,
+        {
+            action: "set_segment_number",
+            segment_id: parameters.segment_id,
+            new_number: parameters.new_number
         }
     );
 };

@@ -48,6 +48,11 @@ class MideaE20ValetudoRobot extends MideaValetudoRobot {
             mapHacksProvider: this.mapHacksProvider
         }));
 
+        this.registerCapability(new capabilities.MideaMapSegmentRenumberCapability({
+            robot: this,
+            mapHacksProvider: this.mapHacksProvider
+        }));
+
         [
             capabilities.MideaPersistentMapControlCapabilityV1,
             capabilities.MideaBasicControlCapabilityV1,

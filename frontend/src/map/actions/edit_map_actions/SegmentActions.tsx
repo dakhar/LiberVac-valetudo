@@ -7,6 +7,7 @@ import {
     useMapSegmentMaterialControlPropertiesQuery,
     useRenameSegmentMutation,
     useSetSegmentMaterialMutation,
+    useSetSegmentNumberMutation,
     useSplitSegmentMutation
 } from "../../../api";
 import React from "react";
@@ -23,8 +24,11 @@ import {
     FormControl,
     FormControlLabel,
     Grid2,
+    InputLabel,
+    MenuItem,
     Radio,
     RadioGroup,
+    Select,
     TextField,
     Typography
 } from "@mui/material";
@@ -36,6 +40,7 @@ import {
     ContentCut as SplitIcon,
     Dashboard as MaterialIcon,
     JoinFull as JoinIcon,
+    Numbers as RenumberIcon,
 } from "@mui/icons-material";
 import {AddCuttingLineIcon, RenameIcon} from "../../../components/CustomIcons";
 
@@ -180,6 +185,67 @@ const SegmentMaterialDialog = (props: SegmentMaterialDialogProps) => {
     );
 };
 
+interface SegmentRenumberDialogProps {
+    open: boolean;
+    onClose: () => void;
+    currentNumber: string;
+    currentName: string;
+    options: Array<{ number: string; label: string }>;
+    onSubmit: (newNumber: string) => void;
+}
+
+const SegmentRenumberDialog = (props: SegmentRenumberDialogProps) => {
+    const {open, onClose, currentNumber, currentName, options, onSubmit} = props;
+    const {t} = useTranslation();
+    const [newNumber, setNewNumber] = React.useState(currentNumber);
+
+    React.useEffect(() => {
+        if (open) {
+            setNewNumber(currentNumber);
+        }
+    }, [open, currentNumber]);
+
+    return (
+        <Dialog open={open} onClose={onClose} sx={{userSelect: "none"}}>
+            <DialogTitle>{t("mapActions.edit.renumberSegment")}</DialogTitle>
+            <DialogContent>
+                <DialogContentText style={{marginBottom: "1rem"}}>
+                    {t("mapActions.edit.renumberSegmentPrompt", {name: currentName, number: currentNumber})}
+                </DialogContentText>
+                <FormControl fullWidth>
+                    <InputLabel id="segment-renumber-select-label">
+                        {t("mapActions.edit.segmentNumber")}
+                    </InputLabel>
+                    <Select
+                        labelId="segment-renumber-select-label"
+                        label={t("mapActions.edit.segmentNumber")}
+                        value={newNumber}
+                        onChange={(e) => {
+                            setNewNumber(`${e.target.value}`);
+                        }}
+                    >
+                        {options.map((option) => (
+                            <MenuItem key={option.number} value={option.number}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose}>{t("common.cancel")}</Button>
+                <Button
+                    onClick={() => {
+                        onSubmit(newNumber);
+                    }}
+                >
+                    {t("common.save")}
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
+
 interface SegmentActionsProperties {
     robotStatus: StatusState,
     selectedSegmentIds: string[];
@@ -192,6 +258,7 @@ interface SegmentActionsProperties {
     supportedCapabilities: {
         [Capability.MapSegmentEdit]: boolean,
         [Capability.MapSegmentRename]: boolean,
+        [Capability.MapSegmentRenumber]: boolean,
         [Capability.MapSegmentMaterialControl]: boolean,
     }
 
@@ -216,6 +283,7 @@ const SegmentActions = (
     const {t} = useTranslation();
 
     const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
+    const [renumberDialogOpen, setRenumberDialogOpen] = React.useState(false);
     const [materialDialogOpen, setMaterialDialogOpen] = React.useState(false);
 
     const {
@@ -242,8 +310,27 @@ const SegmentActions = (
     } = useSetSegmentMaterialMutation({
         onSuccess: onClear,
     });
+    const {
+        mutate: setSegmentNumber,
+        isPending: setSegmentNumberExecuting
+    } = useSetSegmentNumberMutation({
+        onSuccess: onClear,
+    });
 
     const canEdit = props.robotStatus.value === "docked";
+
+    const segmentNumberOptions = React.useMemo(() => {
+        return Object.keys(segmentNames)
+            .sort((a, b) => Number(a) - Number(b))
+            .map((id) => {
+                const name = segmentNames[id];
+
+                return {
+                    number: id,
+                    label: name && name !== id ? `${id} — ${name}` : id
+                };
+            });
+    }, [segmentNames]);
 
     const handleSplitClick = React.useCallback(() => {
         if (!canEdit || !cuttingLine || selectedSegmentIds.length !== 1) {
@@ -295,6 +382,19 @@ const SegmentActions = (
             material: material
         });
     }, [canEdit, setSegmentMaterial, selectedSegmentIds]);
+
+    const handleRenumber = React.useCallback((newNumber: string) => {
+        setRenumberDialogOpen(false);
+
+        if (!canEdit || selectedSegmentIds.length !== 1 || newNumber === selectedSegmentIds[0]) {
+            return;
+        }
+
+        setSegmentNumber({
+            segment_id: selectedSegmentIds[0],
+            new_number: newNumber
+        });
+    }, [canEdit, setSegmentNumber, selectedSegmentIds]);
 
 
     return (
@@ -370,6 +470,34 @@ const SegmentActions = (
                         <RenameIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
                         {t("mapActions.edit.rename")}
                         {renameSegmentExecuting && (
+                            <CircularProgress
+                                color="inherit"
+                                size={18}
+                                style={{marginLeft: 10}}
+                            />
+                        )}
+                    </ActionButton>
+                </Grid2>
+            }
+            {
+                supportedCapabilities[Capability.MapSegmentRenumber] &&
+                selectedSegmentIds.length === 1 &&
+                cuttingLine === undefined &&
+                segmentNumberOptions.length >= 2 &&
+
+                <Grid2>
+                    <ActionButton
+                        disabled={setSegmentNumberExecuting || !canEdit}
+                        color="inherit"
+                        size="medium"
+                        variant="extended"
+                        onClick={() => {
+                            setRenumberDialogOpen(true);
+                        }}
+                    >
+                        <RenumberIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
+                        {t("mapActions.edit.renumber")}
+                        {setSegmentNumberExecuting && (
                             <CircularProgress
                                 color="inherit"
                                 size={18}
@@ -467,6 +595,18 @@ const SegmentActions = (
                     onClose={() => setRenameDialogOpen(false)}
                     currentName={segmentNames[selectedSegmentIds[0]] ?? selectedSegmentIds[0]}
                     onRename={handleRename}
+                />
+            }
+
+            {
+                supportedCapabilities[Capability.MapSegmentRenumber] && selectedSegmentIds.length === 1 &&
+                <SegmentRenumberDialog
+                    open={renumberDialogOpen}
+                    onClose={() => setRenumberDialogOpen(false)}
+                    currentNumber={selectedSegmentIds[0]}
+                    currentName={segmentNames[selectedSegmentIds[0]] ?? selectedSegmentIds[0]}
+                    options={segmentNumberOptions}
+                    onSubmit={handleRenumber}
                 />
             }
 

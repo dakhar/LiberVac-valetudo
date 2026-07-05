@@ -62,6 +62,11 @@ class MideaJ15MaxUltraValetudoRobot extends MideaModernValetudoRobot {
             mapHacksProvider: this.mapHacksProvider
         }));
 
+        this.registerCapability(new capabilities.MideaMapSegmentRenumberCapability({
+            robot: this,
+            mapHacksProvider: this.mapHacksProvider
+        }));
+
         this.registerCapability(new QuirksCapability({
             robot: this,
             quirks: [
@@ -79,6 +84,7 @@ class MideaJ15MaxUltraValetudoRobot extends MideaModernValetudoRobot {
                 quirkFactory.getQuirk(MideaQuirkFactory.KNOWN_QUIRKS.MOP_DOCK_SELF_CLEANING_FREQUENCY),
                 quirkFactory.getQuirk(MideaQuirkFactory.KNOWN_QUIRKS.THRESHOLD_RECOGNITION),
                 quirkFactory.getQuirk(MideaQuirkFactory.KNOWN_QUIRKS.BRIDGE_BOOST),
+                quirkFactory.getQuirk(MideaQuirkFactory.KNOWN_QUIRKS.CRISSCROSS_MODE),
             ]
         }));
 

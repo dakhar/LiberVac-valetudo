@@ -12,6 +12,13 @@ const SETTING = Object.freeze({
     MAP_MANAGEMENT: 0x24,
     JOIN_SEGMENTS: 0x26,
     SPLIT_SEGMENT: 0x27,
+    SET_SEGMENT_TYPE: 0x2A, // per-segment roomType preset (the app's "rename" = category, not a free-text name)
+    SET_SEGMENT_CLEAN_ORDER: 0x2B, // per-segment cleanSeq = the order rooms are visited in a whole-home clean
+    SET_CARPETS: 0x32, // manually-placed carpet zones (geometry + material); pairs with SET_CARPET_CLEAN_STRATEGY
+    SET_THRESHOLDS: 0x33, // door-sills; per-threshold type 0=passable / 1=impassable + 4 corner points
+    TRIGGER_CALIBRATION: 0x5F, // payload [type, action]: 00 00 = gyro/IMU level, 01 01 = battery (reboots)
+    SET_CARPET_CLEAN_STRATEGY: 0x67, // per-carpet clean strategy (avoid/lift/etc)
+    STATION_MAINTENANCE: 0x99, // station maintenance; payload 02 = "restore" = flush/prime water pipes
 
     SET_VALID_MAP_IDS: 0x2D, // Used by the cloud to sync cloud state with device state. The cloud being higher prio
 

@@ -47,7 +47,7 @@ class MideaMapSegmentMaterialControlCapability extends MapSegmentMaterialControl
             }
 
 
-            payload[offset] = parseInt(_segment.id);
+            payload[offset] = parseInt(this.robot.mapHacksProvider.resolvePhysicalSegmentId(_segment.id));
             payload[offset+1] = rawMaterialType;
 
             offset = offset + 2;

@@ -35,6 +35,7 @@ module.exports = {
     MideaMapSegmentMaterialControlCapability: require("./MideaMapSegmentMaterialControlCapability"),
     MideaMapSegmentRenameCapabilityV1: require("./MideaMapSegmentRenameCapabilityV1"),
     MideaMapSegmentRenameCapabilityV2: require("./MideaMapSegmentRenameCapabilityV2"),
+    MideaMapSegmentRenumberCapability: require("./MideaMapSegmentRenumberCapability"),
     MideaMapSegmentationCapabilityV1: require("./MideaMapSegmentationCapabilityV1"),
     MideaMapSegmentationCapabilityV2: require("./MideaMapSegmentationCapabilityV2"),
     MideaMappingPassCapabilityV1: require("./MideaMappingPassCapabilityV1"),

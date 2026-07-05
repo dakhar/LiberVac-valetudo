@@ -23,6 +23,7 @@ interface EditMapProps extends MapProps {
 
         [Capability.MapSegmentEdit]: boolean,
         [Capability.MapSegmentRename]: boolean
+        [Capability.MapSegmentRenumber]: boolean
         [Capability.MapSegmentMaterialControl]: boolean
     }
     mode: mode,
@@ -332,7 +333,8 @@ class EditMap extends BaseMap<EditMapProps, EditMapState> {
                     {
                         (
                             this.props.supportedCapabilities[Capability.MapSegmentEdit] ||
-                            this.props.supportedCapabilities[Capability.MapSegmentRename]
+                            this.props.supportedCapabilities[Capability.MapSegmentRename] ||
+                            this.props.supportedCapabilities[Capability.MapSegmentRenumber]
                         ) &&
                         this.props.mode === "segments" &&
 
@@ -348,6 +350,7 @@ class EditMap extends BaseMap<EditMapProps, EditMapState> {
                             supportedCapabilities={{
                                 [Capability.MapSegmentEdit]: this.props.supportedCapabilities[Capability.MapSegmentEdit],
                                 [Capability.MapSegmentRename]: this.props.supportedCapabilities[Capability.MapSegmentRename],
+                                [Capability.MapSegmentRenumber]: this.props.supportedCapabilities[Capability.MapSegmentRenumber],
                                 [Capability.MapSegmentMaterialControl]: this.props.supportedCapabilities[Capability.MapSegmentMaterialControl]
                             }}
                             onAddCuttingLine={() => {

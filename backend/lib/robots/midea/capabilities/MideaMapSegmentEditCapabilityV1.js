@@ -20,8 +20,8 @@ class MideaMapSegmentEditCapabilityV1 extends MapSegmentEditCapability {
                 Buffer.from([
                     MSmartConst.LEGACY_MULTI_SETTING_SUBCOMMAND.JOIN_SEGMENTS,
                     2, // count
-                    parseInt(segmentA.id),
-                    parseInt(segmentB.id)
+                    parseInt(this.robot.mapHacksProvider.resolvePhysicalSegmentId(segmentA.id)),
+                    parseInt(this.robot.mapHacksProvider.resolvePhysicalSegmentId(segmentB.id))
                 ])
             )
         });
@@ -61,7 +61,7 @@ class MideaMapSegmentEditCapabilityV1 extends MapSegmentEditCapability {
         payload.writeUInt16LE(pBm.x, 5);
         payload.writeUInt16LE(pBm.y, 7);
 
-        payload[9] = parseInt(segment.id);
+        payload[9] = parseInt(this.robot.mapHacksProvider.resolvePhysicalSegmentId(segment.id));
 
         const packet = new MSmartPacket({
             messageType: MSmartPacket.MESSAGE_TYPE.SETTING,

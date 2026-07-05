@@ -70,6 +70,7 @@ import {
     sendObstacleAvoidanceControlState,
     sendPersistentMapEnabled,
     sendRenameSegmentCommand,
+    sendSetSegmentNumberCommand,
     sendSpeakerTestCommand,
     sendSpeakerVolume,
     sendSplitSegmentCommand,
@@ -173,6 +174,7 @@ import {
     MapSegmentEditSplitRequestParameters,
     MapSegmentMaterialControlRequestParameters,
     MapSegmentRenameRequestParameters,
+    MapSegmentRenumberRequestParameters,
     MopDockMopDryingDuration,
     MopDockMopWashTemperature,
     MQTTConfiguration,
@@ -614,6 +616,27 @@ export const useRenameSegmentMutation = (
         ...options,
 
         onError: useOnCommandError(Capability.MapSegmentRename),
+        onSuccess: async (data, ...args) => {
+            queryClient.setQueryData<RobotAttribute[]>([QueryKey.Attributes], data, {
+                updatedAt: Date.now(),
+            });
+            await options?.onSuccess?.(data, ...args);
+        },
+    });
+};
+
+export const useSetSegmentNumberMutation = (
+    options?: UseMutationOptions<RobotAttribute[], unknown, MapSegmentRenumberRequestParameters>
+) => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (parameters: MapSegmentRenumberRequestParameters) => {
+            return sendSetSegmentNumberCommand(parameters).then(fetchStateAttributes); //TODO: this should actually refetch the map
+        },
+        ...options,
+
+        onError: useOnCommandError(Capability.MapSegmentRenumber),
         onSuccess: async (data, ...args) => {
             queryClient.setQueryData<RobotAttribute[]>([QueryKey.Attributes], data, {
                 updatedAt: Date.now(),

@@ -24,6 +24,7 @@ export enum Capability {
     MapReset = "MapResetCapability",
     MapSegmentEdit = "MapSegmentEditCapability",
     MapSegmentRename = "MapSegmentRenameCapability",
+    MapSegmentRenumber = "MapSegmentRenumberCapability",
     MapSegmentMaterialControl = "MapSegmentMaterialControlCapability",
     MapSegmentation = "MapSegmentationCapability",
     MapSnapshot = "MapSnapshotCapability",
@@ -189,6 +190,11 @@ export interface MapSegmentEditSplitRequestParameters {
 export interface MapSegmentRenameRequestParameters {
     segment_id: string;
     name: string;
+}
+
+export interface MapSegmentRenumberRequestParameters {
+    segment_id: string;
+    new_number: string;
 }
 
 export interface MapSegmentMaterialControlRequestParameters {

@@ -42,12 +42,14 @@ const EditMapPage = (props: {
 
         mapSegmentEditCapabilitySupported,
         mapSegmentRenameCapabilitySupported,
+        mapSegmentRenumberCapabilitySupported,
         mapSegmentMaterialControlCapabilitySupported
     ] = useCapabilitiesSupported(
         Capability.CombinedVirtualRestrictions,
 
         Capability.MapSegmentEdit,
         Capability.MapSegmentRename,
+        Capability.MapSegmentRenumber,
         Capability.MapSegmentMaterialControl
     );
 
@@ -115,6 +117,7 @@ const EditMapPage = (props: {
 
             [Capability.MapSegmentEdit]: mapSegmentEditCapabilitySupported,
             [Capability.MapSegmentRename]: mapSegmentRenameCapabilitySupported,
+            [Capability.MapSegmentRenumber]: mapSegmentRenumberCapabilitySupported,
             [Capability.MapSegmentMaterialControl]: mapSegmentMaterialControlCapabilitySupported,
         }}
     />;

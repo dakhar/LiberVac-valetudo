@@ -23,6 +23,7 @@ module.exports = {
     MapSegmentEditCapability: require("./MapSegmentEditCapability"),
     MapSegmentMaterialControlCapability: require("./MapSegmentMaterialControlCapability"),
     MapSegmentRenameCapability: require("./MapSegmentRenameCapability"),
+    MapSegmentRenumberCapability: require("./MapSegmentRenumberCapability"),
     MapSegmentationCapability: require("./MapSegmentationCapability"),
     MapSnapshotCapability: require("./MapSnapshotCapability"),
     MappingPassCapability: require("./MappingPassCapability"),

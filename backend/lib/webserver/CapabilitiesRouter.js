@@ -73,6 +73,7 @@ const CAPABILITY_TYPE_TO_ROUTER_MAPPING = {
     [capabilities.MapSegmentEditCapability.TYPE]: capabilityRouters.MapSegmentEditCapabilityRouter,
     [capabilities.MapResetCapability.TYPE]: capabilityRouters.MapResetCapabilityRouter,
     [capabilities.MapSegmentRenameCapability.TYPE]: capabilityRouters.MapSegmentRenameCapabilityRouter,
+    [capabilities.MapSegmentRenumberCapability.TYPE]: capabilityRouters.MapSegmentRenumberCapabilityRouter,
     [capabilities.PendingMapChangeHandlingCapability.TYPE]: capabilityRouters.PendingMapChangeHandlingCapabilityRouter,
     [capabilities.MappingPassCapability.TYPE]: capabilityRouters.MappingPassCapabilityRouter,
     [capabilities.KeyLockCapability.TYPE]: capabilityRouters.SimpleToggleCapabilityRouter,

@@ -33,7 +33,7 @@ class MideaMapSegmentRenameCapabilityV2 extends MapSegmentRenameCapability {
             throw new Error("Failed to list map ids.");
         }
 
-        this.mapHacksProvider.setName(segment.id, name);
+        this.mapHacksProvider.setName(this.mapHacksProvider.resolvePhysicalSegmentId(segment.id), name);
 
         const reloadMapPacket = new MSmartPacket({
             messageType: MSmartPacket.MESSAGE_TYPE.SETTING,

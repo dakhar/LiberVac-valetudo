@@ -308,10 +308,12 @@ class MideaMapParser {
         }
 
         const roomMetadata = this.mapHacksProvider.getRoomMetadata();
+        const {toDisplay} = this.mapHacksProvider.getSegmentIdRemap();
         Object.keys(pixels.segments).forEach((segmentId) => {
             if (pixels.segments[segmentId].length > 0) {
                 const metaData = {
-                    segmentId: segmentId,
+                    // segmentId is the display id (user renumbering); name/material/active stay keyed by the physical id
+                    segmentId: toDisplay[segmentId] ?? segmentId,
                     material: FLOOR_MATERIAL_MAPPING[roomMetadata[segmentId]?.material] ?? mapEntities.MapLayer.MATERIAL.GENERIC,
                     active: this.activeSegments.includes(segmentId) // Only available on the J15 Max (and newer?)
                 };

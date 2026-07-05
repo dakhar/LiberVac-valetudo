@@ -50,7 +50,7 @@ class MideaMapSegmentationCapabilityV2 extends MapSegmentationCapability {
         segments.slice(0, 10).forEach((segment, i) => {
             const offset = 1 + i * 10;
 
-            segmentDataPayload[offset] = parseInt(segment.id);
+            segmentDataPayload[offset] = parseInt(this.robot.mapHacksProvider.resolvePhysicalSegmentId(segment.id));
             segmentDataPayload[offset + 1] = typeof options?.iterations === "number" ? options.iterations : 1;
             segmentDataPayload[offset + 2] = operationMode;
             // offset + 3 unknown
