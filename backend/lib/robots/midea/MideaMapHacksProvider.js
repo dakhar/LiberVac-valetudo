@@ -133,7 +133,7 @@ class MideaMapHacksProvider {
             return {toDisplay: identityToDisplay, toPhysical: identityToPhysical};
         }
 
-        return {toDisplay, toPhysical};
+        return {toDisplay: toDisplay, toPhysical: toPhysical};
     }
 
     /**
