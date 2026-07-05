@@ -7,7 +7,7 @@ import {
     useMapSegmentMaterialControlPropertiesQuery,
     useRenameSegmentMutation,
     useSetSegmentMaterialMutation,
-    useSetSegmentNumberMutation,
+    useSetSegmentOrderMutation,
     useSplitSegmentMutation
 } from "../../../api";
 import React from "react";
@@ -24,11 +24,12 @@ import {
     FormControl,
     FormControlLabel,
     Grid2,
-    InputLabel,
-    MenuItem,
+    IconButton,
+    List,
+    ListItem,
+    ListItemText,
     Radio,
     RadioGroup,
-    Select,
     TextField,
     Typography
 } from "@mui/material";
@@ -39,10 +40,28 @@ import {
     Clear as ClearIcon,
     ContentCut as SplitIcon,
     Dashboard as MaterialIcon,
+    DragHandle as DragHandleIcon,
+    FormatListNumbered as CleanOrderIcon,
     JoinFull as JoinIcon,
-    Numbers as RenumberIcon,
 } from "@mui/icons-material";
 import {AddCuttingLineIcon, RenameIcon} from "../../../components/CustomIcons";
+import {
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {CSS} from "@dnd-kit/utilities";
 
 const getMaterialLabel = (material: MapSegmentMaterial, t: TFunction): string => {
     switch (material) {
@@ -185,58 +204,112 @@ const SegmentMaterialDialog = (props: SegmentMaterialDialogProps) => {
     );
 };
 
-interface SegmentRenumberDialogProps {
-    open: boolean;
-    onClose: () => void;
-    currentNumber: string;
-    currentName: string;
-    options: Array<{ number: string; label: string }>;
-    onSubmit: (newNumber: string) => void;
+interface SortableSegmentItemProps {
+    id: string;
+    label: string;
+    position: number;
 }
 
-const SegmentRenumberDialog = (props: SegmentRenumberDialogProps) => {
-    const {open, onClose, currentNumber, currentName, options, onSubmit} = props;
+const SortableSegmentItem = (props: SortableSegmentItemProps): React.ReactElement => {
+    const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({id: props.id});
+
+    const style: React.CSSProperties = {
+        transform: CSS.Transform.toString(transform),
+        transition: transition,
+        opacity: isDragging ? 0.4 : 1,
+    };
+
+    return (
+        <ListItem
+            ref={setNodeRef}
+            style={style}
+            divider
+            secondaryAction={
+                <IconButton
+                    edge="end"
+                    aria-label="drag"
+                    {...attributes}
+                    {...listeners}
+                    sx={{cursor: "grab", touchAction: "none"}}
+                >
+                    <DragHandleIcon/>
+                </IconButton>
+            }
+        >
+            <ListItemText primary={`${props.position}. ${props.label}`}/>
+        </ListItem>
+    );
+};
+
+interface CleanOrderDialogProps {
+    open: boolean;
+    onClose: () => void;
+    segmentNames: Record<string, string>;
+    onSubmit: (orderedIds: string[]) => void;
+}
+
+const CleanOrderDialog = (props: CleanOrderDialogProps): React.ReactElement => {
+    const {open, onClose, segmentNames, onSubmit} = props;
     const {t} = useTranslation();
-    const [newNumber, setNewNumber] = React.useState(currentNumber);
+
+    const [order, setOrder] = React.useState<string[]>([]);
 
     React.useEffect(() => {
         if (open) {
-            setNewNumber(currentNumber);
+            setOrder(
+                Object.keys(segmentNames).sort((a, b) => Number(a) - Number(b))
+            );
         }
-    }, [open, currentNumber]);
+    }, [open, segmentNames]);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {coordinateGetter: sortableKeyboardCoordinates})
+    );
+
+    const handleDragEnd = React.useCallback((event: DragEndEvent) => {
+        const {active, over} = event;
+
+        if (over !== null && active.id !== over.id) {
+            setOrder((items) => {
+                return arrayMove(
+                    items,
+                    items.indexOf(`${active.id}`),
+                    items.indexOf(`${over.id}`)
+                );
+            });
+        }
+    }, []);
 
     return (
-        <Dialog open={open} onClose={onClose} sx={{userSelect: "none"}}>
-            <DialogTitle>{t("mapActions.edit.renumberSegment")}</DialogTitle>
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs" sx={{userSelect: "none"}}>
+            <DialogTitle>{t("mapActions.edit.cleanOrder.title")}</DialogTitle>
             <DialogContent>
                 <DialogContentText style={{marginBottom: "1rem"}}>
-                    {t("mapActions.edit.renumberSegmentPrompt", {name: currentName, number: currentNumber})}
+                    {t("mapActions.edit.cleanOrder.prompt")}
                 </DialogContentText>
-                <FormControl fullWidth>
-                    <InputLabel id="segment-renumber-select-label">
-                        {t("mapActions.edit.segmentNumber")}
-                    </InputLabel>
-                    <Select
-                        labelId="segment-renumber-select-label"
-                        label={t("mapActions.edit.segmentNumber")}
-                        value={newNumber}
-                        onChange={(e) => {
-                            setNewNumber(`${e.target.value}`);
-                        }}
-                    >
-                        {options.map((option) => (
-                            <MenuItem key={option.number} value={option.number}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={order} strategy={verticalListSortingStrategy}>
+                        <List>
+                            {order.map((id, index) => {
+                                const name = segmentNames[id];
+                                const label = name && name !== id ?
+                                    name :
+                                    t("mapActions.edit.cleanOrder.segmentFallback", {id: id});
+
+                                return (
+                                    <SortableSegmentItem key={id} id={id} label={label} position={index + 1}/>
+                                );
+                            })}
+                        </List>
+                    </SortableContext>
+                </DndContext>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>{t("common.cancel")}</Button>
                 <Button
                     onClick={() => {
-                        onSubmit(newNumber);
+                        onSubmit(order);
                     }}
                 >
                     {t("common.save")}
@@ -283,7 +356,7 @@ const SegmentActions = (
     const {t} = useTranslation();
 
     const [renameDialogOpen, setRenameDialogOpen] = React.useState(false);
-    const [renumberDialogOpen, setRenumberDialogOpen] = React.useState(false);
+    const [cleanOrderDialogOpen, setCleanOrderDialogOpen] = React.useState(false);
     const [materialDialogOpen, setMaterialDialogOpen] = React.useState(false);
 
     const {
@@ -311,26 +384,15 @@ const SegmentActions = (
         onSuccess: onClear,
     });
     const {
-        mutate: setSegmentNumber,
-        isPending: setSegmentNumberExecuting
-    } = useSetSegmentNumberMutation({
+        mutate: setSegmentOrder,
+        isPending: setSegmentOrderExecuting
+    } = useSetSegmentOrderMutation({
         onSuccess: onClear,
     });
 
     const canEdit = props.robotStatus.value === "docked";
 
-    const segmentNumberOptions = React.useMemo(() => {
-        return Object.keys(segmentNames)
-            .sort((a, b) => Number(a) - Number(b))
-            .map((id) => {
-                const name = segmentNames[id];
-
-                return {
-                    number: id,
-                    label: name && name !== id ? `${id} — ${name}` : id
-                };
-            });
-    }, [segmentNames]);
+    const segmentCount = Object.keys(segmentNames).length;
 
     const handleSplitClick = React.useCallback(() => {
         if (!canEdit || !cuttingLine || selectedSegmentIds.length !== 1) {
@@ -383,18 +445,17 @@ const SegmentActions = (
         });
     }, [canEdit, setSegmentMaterial, selectedSegmentIds]);
 
-    const handleRenumber = React.useCallback((newNumber: string) => {
-        setRenumberDialogOpen(false);
+    const handleSetCleanOrder = React.useCallback((orderedIds: string[]) => {
+        setCleanOrderDialogOpen(false);
 
-        if (!canEdit || selectedSegmentIds.length !== 1 || newNumber === selectedSegmentIds[0]) {
+        if (!canEdit || orderedIds.length < 2) {
             return;
         }
 
-        setSegmentNumber({
-            segment_id: selectedSegmentIds[0],
-            new_number: newNumber
+        setSegmentOrder({
+            segment_ids: orderedIds
         });
-    }, [canEdit, setSegmentNumber, selectedSegmentIds]);
+    }, [canEdit, setSegmentOrder]);
 
 
     return (
@@ -481,23 +542,22 @@ const SegmentActions = (
             }
             {
                 supportedCapabilities[Capability.MapSegmentRenumber] &&
-                selectedSegmentIds.length === 1 &&
                 cuttingLine === undefined &&
-                segmentNumberOptions.length >= 2 &&
+                segmentCount >= 2 &&
 
                 <Grid2>
                     <ActionButton
-                        disabled={setSegmentNumberExecuting || !canEdit}
+                        disabled={setSegmentOrderExecuting || !canEdit}
                         color="inherit"
                         size="medium"
                         variant="extended"
                         onClick={() => {
-                            setRenumberDialogOpen(true);
+                            setCleanOrderDialogOpen(true);
                         }}
                     >
-                        <RenumberIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
-                        {t("mapActions.edit.renumber")}
-                        {setSegmentNumberExecuting && (
+                        <CleanOrderIcon style={{marginRight: "0.25rem", marginLeft: "-0.25rem"}}/>
+                        {t("mapActions.edit.cleanOrder.label")}
+                        {setSegmentOrderExecuting && (
                             <CircularProgress
                                 color="inherit"
                                 size={18}
@@ -599,14 +659,12 @@ const SegmentActions = (
             }
 
             {
-                supportedCapabilities[Capability.MapSegmentRenumber] && selectedSegmentIds.length === 1 &&
-                <SegmentRenumberDialog
-                    open={renumberDialogOpen}
-                    onClose={() => setRenumberDialogOpen(false)}
-                    currentNumber={selectedSegmentIds[0]}
-                    currentName={segmentNames[selectedSegmentIds[0]] ?? selectedSegmentIds[0]}
-                    options={segmentNumberOptions}
-                    onSubmit={handleRenumber}
+                supportedCapabilities[Capability.MapSegmentRenumber] &&
+                <CleanOrderDialog
+                    open={cleanOrderDialogOpen}
+                    onClose={() => setCleanOrderDialogOpen(false)}
+                    segmentNames={segmentNames}
+                    onSubmit={handleSetCleanOrder}
                 />
             }
 

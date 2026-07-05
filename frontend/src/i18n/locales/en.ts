@@ -682,10 +682,12 @@ const en = {
             renameSegmentPrompt: "How should the segment '{{name}}' be called?",
             segmentName: "Segment name",
             rename: "Rename",
-            renumber: "Renumber",
-            renumberSegment: "Renumber Segment",
-            renumberSegmentPrompt: "Which number should the segment '{{name}}' (currently {{number}}) use? It will swap numbers with whichever segment currently uses the chosen one.",
-            segmentNumber: "Segment number",
+            cleanOrder: {
+                label: "Clean order",
+                title: "Clean order",
+                prompt: "Drag the segments into the order they should be cleaned in a full clean. The first one is cleaned first.",
+                segmentFallback: "Segment {{id}}"
+            },
             segmentMaterial: "Segment Material",
             segmentMaterialPrompt: "What material is the floor of segment '{{name}}' made of?",
             material: {

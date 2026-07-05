@@ -193,8 +193,7 @@ export interface MapSegmentRenameRequestParameters {
 }
 
 export interface MapSegmentRenumberRequestParameters {
-    segment_id: string;
-    new_number: string;
+    segment_ids: string[];
 }
 
 export interface MapSegmentMaterialControlRequestParameters {

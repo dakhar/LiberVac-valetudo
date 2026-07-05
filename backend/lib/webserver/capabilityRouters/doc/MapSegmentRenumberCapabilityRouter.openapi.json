@@ -14,14 +14,15 @@
                 "action": {
                   "type": "string",
                   "enum": [
-                    "set_segment_number"
+                    "set_order"
                   ]
                 },
-                "segment_id": {
-                  "type": "string"
-                },
-                "new_number": {
-                  "type": "string"
+                "segment_ids": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "All segment ids in the desired whole-home clean order (first cleaned first)."
                 }
               }
             }

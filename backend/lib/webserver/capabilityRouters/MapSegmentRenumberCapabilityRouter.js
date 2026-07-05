@@ -1,15 +1,13 @@
 const CapabilityRouter = require("./CapabilityRouter");
-const ValetudoMapSegment = require("../../entities/core/ValetudoMapSegment");
 
 class MapSegmentRenumberCapabilityRouter extends CapabilityRouter {
     initRoutes() {
         this.router.put("/", this.validator, async (req, res) => {
-            if (req.body.action === "set_segment_number") {
-                if (req.body.segment_id !== undefined && req.body.new_number !== undefined) {
+            if (req.body.action === "set_order") {
+                if (Array.isArray(req.body.segment_ids) && req.body.segment_ids.length > 0) {
                     try {
-                        await this.capability.setSegmentNumber(
-                            new ValetudoMapSegment({id: `${req.body.segment_id}`}),
-                            `${req.body.new_number}`
+                        await this.capability.setSegmentOrder(
+                            req.body.segment_ids.map(id => `${id}`)
                         );
 
                         res.sendStatus(200);

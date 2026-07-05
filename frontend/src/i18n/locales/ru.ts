@@ -684,10 +684,12 @@ const ru: Translations = {
             renameSegmentPrompt: "Как назвать сегмент «{{name}}»?",
             segmentName: "Название сегмента",
             rename: "Переименовать",
-            renumber: "Сменить номер",
-            renumberSegment: "Сменить номер сегмента",
-            renumberSegmentPrompt: "Какой номер присвоить сегменту «{{name}}» (сейчас {{number}})? Он поменяется номерами с тем сегментом, который сейчас использует выбранный номер.",
-            segmentNumber: "Номер сегмента",
+            cleanOrder: {
+                label: "Порядок уборки",
+                title: "Порядок уборки",
+                prompt: "Перетащите сегменты в том порядке, в котором их убирать при полной уборке. Первый убирается первым.",
+                segmentFallback: "Сегмент {{id}}"
+            },
             segmentMaterial: "Материал сегмента",
             segmentMaterialPrompt: "Из какого материала пол сегмента «{{name}}»?",
             material: {

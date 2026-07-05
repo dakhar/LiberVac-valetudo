@@ -7,17 +7,14 @@ const NotImplementedError = require("../NotImplementedError");
  */
 class MapSegmentRenumberCapability extends Capability {
     /**
-     * Assigns newNumber to the given segment.
+     * Sets the whole-home clean order by assigning each segment a clean-order position
+     * (cleanSeq) from its index in the provided list: segmentIds[0] is cleaned first,
+     * segmentIds[1] second, and so on. The list should contain every current segment id.
      *
-     * This uses swap semantics: the segment that currently uses newNumber (if any) takes
-     * over the number the passed segment had, so the overall numbering always stays a
-     * permutation of the existing segment ids.
-     *
-     * @param {import("../../entities/core/ValetudoMapSegment")} segment
-     * @param {string} newNumber
+     * @param {Array<string>} segmentIds - segment ids in the desired clean order
      * @returns {Promise<void>}
      */
-    async setSegmentNumber(segment, newNumber) {
+    async setSegmentOrder(segmentIds) {
         throw new NotImplementedError();
     }
 

@@ -70,7 +70,7 @@ import {
     sendObstacleAvoidanceControlState,
     sendPersistentMapEnabled,
     sendRenameSegmentCommand,
-    sendSetSegmentNumberCommand,
+    sendSetSegmentOrderCommand,
     sendSpeakerTestCommand,
     sendSpeakerVolume,
     sendSplitSegmentCommand,
@@ -625,14 +625,14 @@ export const useRenameSegmentMutation = (
     });
 };
 
-export const useSetSegmentNumberMutation = (
+export const useSetSegmentOrderMutation = (
     options?: UseMutationOptions<RobotAttribute[], unknown, MapSegmentRenumberRequestParameters>
 ) => {
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (parameters: MapSegmentRenumberRequestParameters) => {
-            return sendSetSegmentNumberCommand(parameters).then(fetchStateAttributes); //TODO: this should actually refetch the map
+            return sendSetSegmentOrderCommand(parameters).then(fetchStateAttributes); //TODO: this should actually refetch the map
         },
         ...options,
 

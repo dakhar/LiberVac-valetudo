@@ -165,49 +165,34 @@ class MideaMapHacksProvider {
     }
 
     /**
-     * Assigns newDisplayId to the segment currently shown as fromDisplayId, swapping display ids
-     * with whichever segment already used newDisplayId. This keeps the numbering a permutation of
-     * the physical segment ids at all times.
+     * Persists the whole-home clean order. orderedIds are segment ids as the UI currently sees
+     * them (display ids), first-to-clean first. Each is resolved to its physical room and given a
+     * valetudoDisplayId equal to its 1-based position in the list. That display id doubles as the
+     * clean-order position (cleanSeq); MideaMapSegmentRenumberCapability pushes the resulting
+     * table to the robot via the SET_SEGMENT_CLEAN_ORDER (0x2B) command. (Writing cleanSeq into
+     * this file directly does NOT work — the room_cfg loader ignores the "cleanSeq" key — so the
+     * order has to go through the command path; here we only persist the Valetudo-side numbering.)
      *
-     * @param {string|number} fromDisplayId - the number the target segment currently shows
-     * @param {string|number} newDisplayId - the number it should show instead
+     * @param {Array<string>} orderedIds - segment ids in the desired clean order
      */
-    setSegmentNumber(fromDisplayId, newDisplayId) {
+    setSegmentOrder(orderedIds) {
         if (this.robot.config.get("embedded") !== true) {
             throw new Error("Only possible when embedded");
         }
 
-        fromDisplayId = `${fromDisplayId}`;
-        newDisplayId = `${newDisplayId}`;
-
-        if (fromDisplayId === newDisplayId) {
-            return;
-        }
-
+        const {toPhysical} = this.getSegmentIdRemap();
         const {roomData, originalStat} = this._readRoomData();
         const rooms = roomData.rooms ?? [];
 
-        const displayIdOf = (room) => `${room.valetudoDisplayId ?? room.id}`;
+        orderedIds.forEach((displayId, index) => {
+            const physicalId = toPhysical[`${displayId}`] ?? `${displayId}`;
+            const room = rooms.find(r => `${r.id}` === `${physicalId}`);
 
-        const roomToRenumber = rooms.find(r => displayIdOf(r) === fromDisplayId);
-        const roomToSwapWith = rooms.find(r => displayIdOf(r) === newDisplayId);
+            if (room) {
+                room.valetudoDisplayId = index + 1;
+            }
+        });
 
-        if (!roomToRenumber) {
-            throw new Error(`No segment currently numbered ${fromDisplayId}`);
-        }
-        if (!roomToSwapWith) {
-            // Swap semantics: a number can only be taken from an existing segment
-            throw new Error(`Cannot assign number ${newDisplayId}: no segment currently uses it`);
-        }
-
-        roomToRenumber.valetudoDisplayId = Number(newDisplayId);
-        roomToSwapWith.valetudoDisplayId = Number(fromDisplayId);
-
-        // The display id doubles as the clean-order position. The robot itself is told about the
-        // new order by MideaMapSegmentRenumberCapability, which pushes the full per-segment
-        // cleanSeq via the SET_SEGMENT_CLEAN_ORDER (0x2B) command. Writing cleanSeq into this file
-        // directly does NOT work: the room_cfg loader ignores the "cleanSeq" key, so the order has
-        // to go through the command path. Here we only persist the Valetudo-side display numbering.
         this._persistRoomData(roomData, originalStat);
     }
 

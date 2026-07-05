@@ -19,23 +19,22 @@ class MideaMapSegmentRenumberCapability extends MapSegmentRenumberCapability {
     }
 
     /**
-     * On the V16/J15 a segment's "number" IS its clean-order position (cleanSeq): during a
-     * whole-home clean the robot visits segments ordered by this value. The official app sets it
-     * with a dedicated SET_SEGMENT_CLEAN_ORDER (0x2B) command that carries the cleanSeq for every
-     * segment at once; the firmware persists it into room_cfg and switches the run into
-     * customized-order mode (manager _handle_customized_clean_param).
+     * On the V16/J15 the whole-home clean order is the per-segment cleanSeq: during a full
+     * clean the robot visits segments ordered by this value. The official app sets it with a
+     * dedicated SET_SEGMENT_CLEAN_ORDER (0x2B) command carrying the cleanSeq for every segment
+     * at once; the firmware persists it into room_cfg and switches the run into customized-order
+     * mode (manager _handle_customized_clean_param).
      *
-     * We mirror that: update the local display-id permutation (so the UI relabels the segments)
-     * and then push the resulting cleanSeq for every segment to the robot.
+     * We mirror that: persist the new order locally (cleanSeq = position in the list) and push
+     * the full cleanSeq table to the robot in one 0x2B command.
      *
-     * @param {import("../../../entities/core/ValetudoMapSegment")} segment
-     * @param {string} newNumber
+     * @param {Array<string>} segmentIds - segment ids in the desired clean order
      * @returns {Promise<void>}
      */
-    async setSegmentNumber(segment, newNumber) {
-        this.mapHacksProvider.setSegmentNumber(segment.id, newNumber);
+    async setSegmentOrder(segmentIds) {
+        this.mapHacksProvider.setSegmentOrder(segmentIds);
 
-        // physicalSegmentId -> displayId, where displayId is the clean-order position (cleanSeq)
+        // physicalSegmentId -> cleanSeq (the clean-order position we just persisted)
         const remap = this.mapHacksProvider.getSegmentIdRemap().toDisplay;
         const order = Object.keys(remap).map(physicalId => {
             return {

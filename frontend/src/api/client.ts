@@ -372,15 +372,14 @@ export const sendRenameSegmentCommand = async (
     );
 };
 
-export const sendSetSegmentNumberCommand = async (
+export const sendSetSegmentOrderCommand = async (
     parameters: MapSegmentRenumberRequestParameters
 ): Promise<void> => {
     await valetudoAPI.put(
         `/robot/capabilities/${Capability.MapSegmentRenumber}`,
         {
-            action: "set_segment_number",
-            segment_id: parameters.segment_id,
-            new_number: parameters.new_number
+            action: "set_order",
+            segment_ids: parameters.segment_ids
         }
     );
 };
