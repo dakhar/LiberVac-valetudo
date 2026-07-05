@@ -25,7 +25,7 @@ class MideaMapHacksProvider {
         this.robot = options.robot;
 
         this.lastRoomMetadataUpdate = undefined;
-        /** @type {{[key: string]: {material: number, name?: string}}} */
+        /** @type {{[key: string]: {material: number, name?: string, displayId?: number}}} */
         this.lastRoomMetadata = {};
     }
 
@@ -39,7 +39,7 @@ class MideaMapHacksProvider {
     }
 
     /**
-     * @return {{[key: string]: {material: number, name?: string}}}
+     * @return {{[key: string]: {material: number, name?: string, displayId?: number}}}
      */
     getRoomMetadata() {
         if (this.robot.config.get("embedded") !== true) {
@@ -97,7 +97,9 @@ class MideaMapHacksProvider {
         const meta = this.getRoomMetadata();
         const physicalIds = Object.keys(meta);
 
+        /** @type {{[key: string]: string}} */
         const toDisplay = {};
+        /** @type {{[key: string]: string}} */
         const toPhysical = {};
         const usedDisplayIds = new Set();
         let valid = true;
@@ -118,7 +120,9 @@ class MideaMapHacksProvider {
         }
 
         if (!valid) {
+            /** @type {{[key: string]: string}} */
             const identityToDisplay = {};
+            /** @type {{[key: string]: string}} */
             const identityToPhysical = {};
 
             for (const physicalId of physicalIds) {
