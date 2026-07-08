@@ -9,6 +9,7 @@ const MqttCommonAttributes = require("../MqttCommonAttributes");
 const NodeMqttHandle = require("./NodeMqttHandle");
 const path = require("path");
 const PropertyMqttHandle = require("./PropertyMqttHandle");
+const Tools = require("../../utils/Tools");
 const zlib = require("zlib");
 
 class MapNodeMqttHandle extends NodeMqttHandle {
@@ -52,7 +53,10 @@ class MapNodeMqttHandle extends NodeMqttHandle {
                 datatype: DataType.STRING,
                 format: "json",
                 getter: async () => {
-                    if (this.robot.state.map === null || !(this.controller.currentConfig.customizations.provideMapData ?? true)|| !this.controller.isInitialized) {
+                    // Segments are intentionally decoupled from `provideMapData`: they are a tiny,
+                    // homie-native id->name mapping (not the heavy raw map blob), so they keep
+                    // publishing even when raw map data delivery is disabled.
+                    if (this.robot.state.map === null || !this.controller.isInitialized) {
                         return {};
                     }
 
@@ -100,6 +104,27 @@ class MapNodeMqttHandle extends NodeMqttHandle {
                         })
                     );
                 });
+            })
+        );
+
+        // LiberVac addition: a URL to Valetudo's own built-in live map. This lets Home Assistant
+        // render the map in a browser (webpage/iframe card) instead of shipping the raw deflated
+        // map blob over MQTT — the viewing client renders it, so the robot does ~no extra work.
+        // Deliberately NOT gated by `provideMapData`: it is the lightweight alternative to it.
+        this.registerChild(
+            new PropertyMqttHandle({
+                parent: this,
+                controller: this.controller,
+                topicName: "url",
+                friendlyName: "Map URL",
+                datatype: DataType.STRING,
+                format: "url",
+                getter: async () => {
+                    return `http://${Tools.GET_PRIMARY_HOST_IPV4()}/`;
+                },
+                helpText: "LiberVac addition. URL to Valetudo's built-in live map. Embed it in a " +
+                    "Home Assistant webpage/iframe card to render the map client-side instead of " +
+                    "consuming the raw `map-data` blob."
             })
         );
 

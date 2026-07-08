@@ -42,7 +42,7 @@ class CameraNodeMqttHandle extends NodeMqttHandle {
                 datatype: DataType.STRING,
                 format: "url",
                 getter: async () => {
-                    const ip = CameraNodeMqttHandle.GET_HOST_IP();
+                    const ip = Tools.GET_PRIMARY_HOST_IPV4();
 
                     // go2rtc's built-in player (WebRTC with MSE fallback) — the same URL the
                     // Valetudo camera overlay embeds. Browser-friendly, embeddable in an iframe.
@@ -62,7 +62,7 @@ class CameraNodeMqttHandle extends NodeMqttHandle {
                 datatype: DataType.STRING,
                 format: "url",
                 getter: async () => {
-                    const ip = CameraNodeMqttHandle.GET_HOST_IP();
+                    const ip = Tools.GET_PRIMARY_HOST_IPV4();
 
                     // Raw native-quality H.264 RTSP served by vidtap. Point a Home Assistant
                     // generic camera / go2rtc / ffmpeg / VLC at this.
@@ -79,21 +79,6 @@ class CameraNodeMqttHandle extends NodeMqttHandle {
      */
     getQoS() {
         return MqttCommonAttributes.QOS.AT_LEAST_ONCE;
-    }
-
-    /**
-     * Best-effort determination of the robot's own LAN IPv4 address so the published URLs are
-     * reachable from other hosts. Falls back to 127.0.0.1 if none can be determined.
-     *
-     * @private
-     * @returns {string}
-     */
-    static GET_HOST_IP() {
-        const iface = Tools.GET_NETWORK_INTERFACES().find(i => {
-            return i.family === "IPv4" && i.internal !== true;
-        });
-
-        return iface?.address ?? "127.0.0.1";
     }
 }
 

@@ -231,6 +231,21 @@ class Tools {
         return [...new Set(IPs)]; // dedupe
     }
 
+    /**
+     * Returns the primary non-internal IPv4 address of this host, or 127.0.0.1 if none can be
+     * determined. Used to build MQTT-published URLs (camera stream, map view) that need to be
+     * reachable from other hosts on the LAN.
+     *
+     * @returns {string}
+     */
+    static GET_PRIMARY_HOST_IPV4() {
+        const iface = Tools.GET_NETWORK_INTERFACES().find(i => {
+            return i.family === "IPv4" && i.internal !== true;
+        });
+
+        return iface?.address ?? "127.0.0.1";
+    }
+
     static GET_NETWORK_INTERFACE_MACS_FROM_NODEJS() {
         const macs = Tools
             .GET_NETWORK_INTERFACES()
