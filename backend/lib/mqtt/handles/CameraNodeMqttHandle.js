@@ -27,8 +27,8 @@ class CameraNodeMqttHandle extends NodeMqttHandle {
             friendlyName: "Camera",
             type: "Camera",
             helpText: "LiberVac addition. This handle publishes the local camera stream URLs " +
-                "(go2rtc WebRTC/MSE player and raw RTSP). It is only attached for robots that " +
-                "feature a camera."
+                "(go2rtc WebRTC/MSE player, raw RTSP and HLS). It is only attached for robots " +
+                "that feature a camera."
         }));
 
         this.robot = options.robot;
@@ -70,6 +70,27 @@ class CameraNodeMqttHandle extends NodeMqttHandle {
                 },
                 helpText: "The raw RTSP URL served by vidtap. Suitable for a Home Assistant generic " +
                     "camera, go2rtc, ffmpeg or VLC."
+            })
+        );
+
+        this.registerChild(
+            new PropertyMqttHandle({
+                parent: this,
+                controller: this.controller,
+                topicName: "hls-url",
+                friendlyName: "HLS URL",
+                datatype: DataType.STRING,
+                format: "url",
+                getter: async () => {
+                    const ip = Tools.GET_PRIMARY_HOST_IPV4();
+
+                    // go2rtc's HLS output (served on the API port). Pulled on-demand like the
+                    // WebRTC player. Playable by Safari natively, hls.js, ffmpeg, VLC and any
+                    // HLS-capable player / dashboard.
+                    return `http://${ip}:${CameraNodeMqttHandle.GO2RTC_PORT}/api/stream.m3u8?src=${CameraNodeMqttHandle.STREAM_NAME}`;
+                },
+                helpText: "The go2rtc HLS (.m3u8) URL for the camera. Playable by Safari, hls.js, " +
+                    "ffmpeg, VLC and any HLS-capable player."
             })
         );
     }
