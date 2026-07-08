@@ -9,6 +9,7 @@ const MapLayer = require("../../entities/map/MapLayer");
 const MqttCommonAttributes = require("../MqttCommonAttributes");
 const NodeMqttHandle = require("./NodeMqttHandle");
 const path = require("path");
+const PointMapEntity = require("../../entities/map/entities/PointMapEntity");
 const PropertyMqttHandle = require("./PropertyMqttHandle");
 const Tools = require("../../utils/Tools");
 const zlib = require("zlib");
@@ -137,6 +138,58 @@ class MapNodeMqttHandle extends NodeMqttHandle {
                 },
                 helpText: "LiberVac addition. A JSON mapping of the segment IDs the robot is " +
                     "currently cleaning (active) to their names. Empty when idle."
+            })
+        );
+
+        // LiberVac addition: the single segment the robot is physically inside RIGHT NOW,
+        // derived locally by point-in-segment (robot_position entity vs each segment's pixels).
+        // The firmware's GET_ACTIVE_SEGMENTS gives the whole selected job set, not the current
+        // room, so we compute "current room" ourselves from data we already have. Empty {} when
+        // there is no robot position or it falls outside every segment (doorway/wall/unmapped).
+        this.registerChild(
+            new PropertyMqttHandle({
+                parent: this,
+                controller: this.controller,
+                topicName: "current-segment",
+                friendlyName: "Current segment",
+                datatype: DataType.STRING,
+                format: "json",
+                getter: async () => {
+                    const map = this.robot.state.map;
+                    if (map === null || !this.controller.isInitialized || !map.pixelSize) {
+                        return {};
+                    }
+
+                    const robot = map.entities.find(e => e.type === PointMapEntity.TYPE.ROBOT_POSITION);
+                    if (robot === undefined || !Array.isArray(robot.points) || robot.points.length < 2) {
+                        return {};
+                    }
+
+                    // robot_position is in cm; segment pixels are in grid units (cm / pixelSize).
+                    const gx = Math.floor(robot.points[0] / map.pixelSize);
+                    const gy = Math.floor(robot.points[1] / map.pixelSize);
+
+                    for (const layer of map.layers) {
+                        if (layer.type !== MapLayer.TYPE.SEGMENT) {
+                            continue;
+                        }
+
+                        // compressedPixels = flat [xStart, y, count] runs
+                        const cp = layer.compressedPixels;
+                        for (let i = 0; i < cp.length; i += 3) {
+                            if (cp[i + 1] === gy && cp[i] <= gx && gx < cp[i] + cp[i + 2]) {
+                                const id = `${layer.metaData.segmentId}`;
+
+                                return {[id]: layer.metaData.name ?? id};
+                            }
+                        }
+                    }
+
+                    return {};
+                },
+                helpText: "LiberVac addition. A JSON {id: name} of the single segment the robot is " +
+                    "physically inside right now (computed via point-in-segment from its position). " +
+                    "Empty when the robot is in a doorway/wall or off-map."
             })
         );
 
