@@ -1,6 +1,8 @@
 const CallbackAttributeSubscriber = require("../../entities/CallbackAttributeSubscriber");
 const MqttHandle = require("./MqttHandle");
 
+const CameraLightControlCapability = require("../../core/capabilities/CameraLightControlCapability");
+const CameraNodeMqttHandle = require("./CameraNodeMqttHandle");
 const CAPABILITY_TYPE_TO_HANDLE_MAPPING = require("./HandleMappings").CAPABILITY_TYPE_TO_HANDLE_MAPPING;
 const Logger = require("../../Logger");
 const MapNodeMqttHandle = require("./MapNodeMqttHandle");
@@ -44,6 +46,16 @@ class RobotMqttHandle extends MqttHandle {
             valetudoEventStore: this.valetudoEventStore
         });
         this.registerChild(this.valetudoEventsHandle);
+
+        // LiberVac addition: robots with a camera (go2rtc/vidtap local stream) expose their
+        // camera stream URLs so Home Assistant & co. can find the stream over MQTT/Homie.
+        if (this.robot.capabilities[CameraLightControlCapability.TYPE] !== undefined) {
+            this.registerChild(new CameraNodeMqttHandle({
+                parent: this,
+                controller: this.controller,
+                robot: this.robot
+            }));
+        }
 
         // Attach all available capabilities to self
         for (const [type, capability] of Object.entries(this.robot.capabilities)) {
