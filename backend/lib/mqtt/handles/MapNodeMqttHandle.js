@@ -5,6 +5,7 @@ const fs = require("fs");
 const HassAnchor = require("../homeassistant/HassAnchor");
 const InLineHassComponent = require("../homeassistant/components/InLineHassComponent");
 const Logger = require("../../Logger");
+const MapLayer = require("../../entities/map/MapLayer");
 const MqttCommonAttributes = require("../MqttCommonAttributes");
 const NodeMqttHandle = require("./NodeMqttHandle");
 const path = require("path");
@@ -104,6 +105,38 @@ class MapNodeMqttHandle extends NodeMqttHandle {
                         })
                     );
                 });
+            })
+        );
+
+        // LiberVac addition: the segments the robot currently considers active (i.e. part of the
+        // ongoing cleaning job). Sourced from the firmware's GET_ACTIVE_SEGMENTS query, which the
+        // Midea map parser folds into each segment layer's `active` flag (J15 Max and newer).
+        // Empty {} when idle / nothing active. Like `segments`, not gated by `provideMapData`.
+        this.registerChild(
+            new PropertyMqttHandle({
+                parent: this,
+                controller: this.controller,
+                topicName: "active-segments",
+                friendlyName: "Active segments",
+                datatype: DataType.STRING,
+                format: "json",
+                getter: async () => {
+                    if (this.robot.state.map === null || !this.controller.isInitialized) {
+                        return {};
+                    }
+
+                    const res = {};
+                    for (const layer of this.robot.state.map.layers) {
+                        if (layer.type === MapLayer.TYPE.SEGMENT && layer.metaData.active === true) {
+                            const id = `${layer.metaData.segmentId}`;
+                            res[id] = layer.metaData.name ?? id;
+                        }
+                    }
+
+                    return res;
+                },
+                helpText: "LiberVac addition. A JSON mapping of the segment IDs the robot is " +
+                    "currently cleaning (active) to their names. Empty when idle."
             })
         );
 
